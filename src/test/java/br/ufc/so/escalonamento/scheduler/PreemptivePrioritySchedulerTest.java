@@ -8,43 +8,52 @@ import static br.ufc.so.escalonamento.scheduler.SchedulingAssertions.referencePr
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import br.ufc.so.escalonamento.domain.ProcessControlBlock;
-import br.ufc.so.escalonamento.domain.ProcessState;
 import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
-class FcfsSchedulerTest {
+class PreemptivePrioritySchedulerTest {
     @Test
     void deveEscalonarOCasoDeReferencia() {
         SchedulingResult result = scheduler().schedule(referenceProcesses());
 
         assertEquals(
-                List.of(2, 2, 1, 1, 1, 1, 1, 3, 3, 3, 3, 4, 4, 4),
+                List.of(2, 2, 1, 4, 4, 4, 1, 1, 1, 1, 3, 3, 3, 3),
                 result.timeline());
-        assertCompletionTimes(result, 7, 2, 11, 14);
-        assertMetrics(result, 7.50, 4.00, 3);
+        assertCompletionTimes(result, 10, 2, 14, 6);
+        assertMetrics(result, 7.00, 3.50, 4);
     }
 
     @Test
-    void deveRespeitarOrdemDeChegadaMesmoQuandoAEntradaNaoEstaOrdenada() {
-        SchedulingResult result = scheduler().schedule(processes(
-                new int[] {5, 1, 1},
-                new int[] {0, 2, 2},
-                new int[] {1, 1, 3}));
-
-        assertEquals(List.of(2, 2, 3, 0, 0, 1), result.timeline());
-        assertCompletionTimes(result, 6, 2, 3);
-        assertMetrics(result, 5.0 / 3.0, 1.0 / 3.0, 1);
-    }
-
-    @Test
-    void naoDevePreemptarQuandoProcessoMaisCurtoChega() {
+    void devePreemptarQuandoChegaProcessoMaisPrioritario() {
         SchedulingResult result = scheduler().schedule(processes(
                 new int[] {0, 5, 1},
                 new int[] {2, 1, 3}));
 
-        assertEquals(List.of(1, 1, 1, 1, 1, 2), result.timeline());
-        assertCompletionTimes(result, 5, 6);
+        assertEquals(List.of(1, 1, 2, 1, 1, 1), result.timeline());
+        assertCompletionTimes(result, 6, 3);
+        assertMetrics(result, 3.50, 0.50, 2);
+    }
+
+    @Test
+    void naoDevePreemptarPorPrioridadeIgual() {
+        SchedulingResult result = scheduler().schedule(processes(
+                new int[] {0, 4, 3},
+                new int[] {1, 1, 3}));
+
+        assertEquals(List.of(1, 1, 1, 1, 2), result.timeline());
+        assertCompletionTimes(result, 4, 5);
+        assertMetrics(result, 4.00, 1.50, 1);
+    }
+
+    @Test
+    void deveDesempatarPrioridadePeloMenorTempoRestante() {
+        SchedulingResult result = scheduler().schedule(processes(
+                new int[] {0, 3, 2},
+                new int[] {0, 1, 2}));
+
+        assertEquals(List.of(2, 1, 1, 1), result.timeline());
+        assertCompletionTimes(result, 4, 1);
     }
 
     @Test
@@ -58,17 +67,7 @@ class FcfsSchedulerTest {
     }
 
     @Test
-    void deveAdmitirChegadaNoTerminoDeOutroProcesso() {
-        SchedulingResult result = scheduler().schedule(processes(
-                new int[] {0, 2, 1},
-                new int[] {2, 1, 1}));
-
-        assertEquals(List.of(1, 1, 2), result.timeline());
-        assertMetrics(result, 1.50, 0.00, 1);
-    }
-
-    @Test
-    void deveAplicarDesempateAleatorioAposOsDemaisCriterios() {
+    void deveAplicarDesempateAleatorioQuandoNenhumProcessoOcupaACpu() {
         SchedulingResult result = scheduler().schedule(processes(
                 new int[] {0, 1, 1},
                 new int[] {0, 1, 1}));
@@ -78,26 +77,13 @@ class FcfsSchedulerTest {
     }
 
     @Test
-    void deveTerminarTodosOsProcessos() {
-        List<ProcessControlBlock> inputProcesses = processes(new int[] {2, 2, 1});
-
-        SchedulingResult result = scheduler().schedule(inputProcesses);
-
-        assertEquals(List.of(0, 0, 1, 1), result.timeline());
-        assertEquals(ProcessState.TERMINATED, result.processes().getFirst().state());
-        assertEquals(4, result.processes().getFirst().completionTime());
-        assertEquals(ProcessState.NEW, inputProcesses.getFirst().state());
-        assertEquals(2, inputProcesses.getFirst().remainingTime());
-    }
-
-    @Test
     void deveRespeitarAsInvariantesDaSimulacao() {
         List<ProcessControlBlock> input = referenceProcesses();
 
         assertValidSimulation(input, scheduler().schedule(input));
     }
 
-    private FcfsScheduler scheduler() {
-        return new FcfsScheduler(new Random(0));
+    private PreemptivePriorityScheduler scheduler() {
+        return new PreemptivePriorityScheduler(new Random(0));
     }
 }

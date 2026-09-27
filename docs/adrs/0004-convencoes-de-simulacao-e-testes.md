@@ -22,6 +22,16 @@ O enunciado define algoritmos, entradas, métricas e desempates, mas não especi
 10. No Round-Robin prioritário, o aging ocorrerá ao término de cada quantum completo e afetará processos que aguardam. Não ocorrerá na inicialização nem após término antecipado.
 11. A chegada de processo mais prioritário não interromperá o quantum em andamento no Round-Robin prioritário.
 
+### Complemento de 26/09/2026 (T07–T12)
+
+Regras que surgiram na implementação dos algoritmos e que o enunciado não fixa:
+
+12. Nos algoritmos preemptivos (SRTF e prioridade preemptiva), a preempção exige candidato estritamente melhor. Em empate, o processo em execução permanece, aplicando o primeiro desempate do enunciado.
+13. No Round-Robin prioritário, o processo que esgota o quantum deixa a CPU e disputa a seleção seguinte sem a preferência de "processo que já ocupa a CPU". A escolha é feita por maior prioridade dinâmica, depois menor tempo restante e, por fim, sorteio. Essa leitura é a única compatível com o CT-05 e é coerente com o item 8.
+14. No Round-Robin prioritário, o aging é aplicado quando o quantum é consumido por completo, mesmo que o processo termine exatamente no limite. Somente o término com menos segundos que o quantum dispensa o aging. O caso de referência do enunciado só produz a linha do tempo esperada com esta regra (término de `P2` em `t = 2`).
+15. No Round-Robin prioritário, um processo que chega exatamente no limite do quantum não recebe o aging daquele limite, pois ainda não aguardou. Processos que chegaram durante o quantum recebem o aging (CT-12).
+16. As prioridades dos algoritmos de prioridade sem Round-Robin usam somente a prioridade estática, pois o aging é exigido apenas no Round-Robin prioritário.
+
 ## Relação com as fontes
 
 - A ordem de desempate e a ausência de preempção por prioridade no Round-Robin prioritário vêm do enunciado.

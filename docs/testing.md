@@ -39,6 +39,8 @@ O relatório HTML é gerado em `build/reports/tests/test/index.html`. Um card de
 - Para desempates que ainda dependam de escolha aleatória, os candidatos são ordenados por identificador e os testes usam `java.util.Random` com semente `0`.
 - No Round-Robin prioritário, o aging é aplicado aos processos que aguardam sempre que um quantum completo termina. Não é aplicado na inicialização nem quando o processo termina antes de consumir o quantum.
 - A chegada de processo mais prioritário não interrompe o quantum em andamento.
+- No SRTF e na prioridade preemptiva, somente candidato estritamente melhor preempta o processo em execução.
+- No Round-Robin prioritário, o processo que esgota o quantum não tem preferência no desempate seguinte. O aging ocorre sempre que o quantum é consumido por completo, inclusive quando o processo termina no limite, e não alcança processos que chegam exatamente nesse limite.
 
 ## 4. Níveis de teste
 
@@ -431,10 +433,24 @@ Para todos os algoritmos e entradas válidas:
 - turnaround e espera nunca são negativos;
 - a soma dos intervalos não ociosos é igual à soma das durações.
 
-## 7. Classes de teste previstas
+### CT-19 — Casos complementares dos algoritmos (T07–T12)
 
-- `ProcessParserTest`.
+Casos acrescentados durante a implementação para fixar regras não cobertas pelos anteriores:
+
+| Algoritmo | Configuração | Entrada | Linha do tempo esperada | Regra verificada |
+| --- | --- | --- | --- | --- |
+| SJF | — | `0 2 1`, `0 4 1`, `1 1 1` | `[0,2) P1; [2,3) P3; [3,7) P2` | Chegada posterior mais curta vence a mais longa já pronta. |
+| SRTF | — | `0 3 1`, `1 2 1` | `[0,3) P1; [3,5) P2` | Empate de tempo restante mantém o processo na CPU. |
+| SRTF | — | `0 4 1`, `1 1 1`, `2 5 1` | `[0,1) P1; [1,2) P2; [2,5) P1; [5,10) P3` | Processo preemptado é retomado; `TT = 14/3`, `TW = 4/3`, 3 trocas. |
+| Prioridade (ambas) | — | `0 3 2`, `0 1 2` | `[0,1) P2; [1,4) P1` | Prioridade igual é desempatada pelo menor tempo restante. |
+| RR prioritário | `quantum = 2`, `aging = 1` | `0 3 2`, `2 5 2` | `[0,3) P1; [3,8) P2` | Chegada no limite do quantum não recebe aging. |
+| RR prioritário | `quantum = 1`, `aging = 0` | `0 2 1`, `0 2 3` | `[0,2) P2; [2,4) P1` | Aging nulo mantém a seleção por prioridade estática. |
+
+## 7. Classes de teste
+
+- `ProcessInputParserTest`.
 - `ConfigurationParserTest`.
+- `ProcessControlBlockTest`.
 - `FcfsSchedulerTest`.
 - `SjfSchedulerTest`.
 - `SrtfSchedulerTest`.
@@ -442,6 +458,11 @@ Para todos os algoritmos e entradas válidas:
 - `PreemptivePrioritySchedulerTest`.
 - `RoundRobinSchedulerTest`.
 - `PriorityRoundRobinSchedulerTest`.
+
+Os testes dos escalonadores compartilham `SchedulingAssertions`, que recalcula métricas e trocas de contexto de forma independente e verifica as invariantes do CT-18.
+
+Previstas para os próximos cards:
+
 - `MetricsCalculatorTest`.
 - `ContextSwitchCounterTest`.
 - `SchedulerApplicationTest`.

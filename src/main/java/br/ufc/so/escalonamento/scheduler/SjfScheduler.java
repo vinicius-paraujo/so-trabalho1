@@ -10,14 +10,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-public final class FcfsScheduler {
+/** Shortest Job First não preemptivo. */
+public final class SjfScheduler {
     private final Random random;
 
-    public FcfsScheduler() {
+    public SjfScheduler() {
         this(new Random());
     }
 
-    public FcfsScheduler(Random random) {
+    public SjfScheduler(Random random) {
         this.random = Objects.requireNonNull(random, "A fonte aleatória é obrigatória.");
     }
 
@@ -38,10 +39,11 @@ public final class FcfsScheduler {
                 continue;
             }
 
-            ProcessControlBlock runningProcess = selectNextProcess(readyProcesses);
+            ProcessControlBlock runningProcess = selectShortestJob(readyProcesses);
             readyProcesses.remove(runningProcess);
             runningProcess.markRunning();
 
+            // Sem preempção: chegadas durante a execução apenas entram na fila de prontos.
             while (runningProcess.remainingTime() > 0) {
                 timeline.add(runningProcess.id());
                 runningProcess.executeOneSecond();
@@ -56,23 +58,19 @@ public final class FcfsScheduler {
         return new SchedulingResult(timeline, processes);
     }
 
-    private ProcessControlBlock selectNextProcess(List<ProcessControlBlock> readyProcesses) {
-        int earliestArrival = Integer.MAX_VALUE;
+    /**
+     * Como nenhum processo é interrompido, a duração de um processo pronto coincide com seu
+     * tempo restante; o segundo critério de desempate não pode separar candidatos empatados.
+     */
+    private ProcessControlBlock selectShortestJob(List<ProcessControlBlock> readyProcesses) {
+        int shortestDuration = Integer.MAX_VALUE;
         for (ProcessControlBlock process : readyProcesses) {
-            earliestArrival = Math.min(earliestArrival, process.arrivalTime());
-        }
-
-        int shortestRemainingTime = Integer.MAX_VALUE;
-        for (ProcessControlBlock process : readyProcesses) {
-            if (process.arrivalTime() == earliestArrival) {
-                shortestRemainingTime = Math.min(shortestRemainingTime, process.remainingTime());
-            }
+            shortestDuration = Math.min(shortestDuration, process.duration());
         }
 
         List<ProcessControlBlock> tiedProcesses = new ArrayList<>();
         for (ProcessControlBlock process : readyProcesses) {
-            if (process.arrivalTime() == earliestArrival
-                    && process.remainingTime() == shortestRemainingTime) {
+            if (process.duration() == shortestDuration) {
                 tiedProcesses.add(process);
             }
         }

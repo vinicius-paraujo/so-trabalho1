@@ -18,12 +18,12 @@
 | T04 | Especificar casos de teste e resultados esperados | Marcos | T01, T03 | Concluído |
 | T05 | Implementar configuração, entrada e modelo explícito de processo | Marcos | T04 | Concluído |
 | T06 | Implementar FCFS | Marcos | T05 | Concluído |
-| T07 | Implementar SJF não preemptivo | A definir | T05 | Pendente |
-| T08 | Implementar SRTF preemptivo | A definir | T05 | Pendente |
-| T09 | Implementar prioridade não preemptiva | A definir | T05 | Pendente |
-| T10 | Implementar prioridade preemptiva | A definir | T05 | Pendente |
-| T11 | Implementar Round-Robin sem prioridade | A definir | T05 | Pendente |
-| T12 | Implementar Round-Robin com prioridade e aging | A definir | T05 | Pendente |
+| T07 | Implementar SJF não preemptivo | A definir | T05 | Em revisão |
+| T08 | Implementar SRTF preemptivo | A definir | T05 | Em revisão |
+| T09 | Implementar prioridade não preemptiva | A definir | T05 | Em revisão |
+| T10 | Implementar prioridade preemptiva | A definir | T05 | Em revisão |
+| T11 | Implementar Round-Robin sem prioridade | A definir | T05 | Em revisão |
+| T12 | Implementar Round-Robin com prioridade e aging | A definir | T05 | Em revisão |
 | T13 | Consolidar métricas, trocas de contexto e linha do tempo | A definir | T06–T12 | Pendente |
 | T14 | Executar validação integrada e revisão cruzada | A definir | T13 | Pendente |
 | T15 | Implementar interface gráfica | A definir | T14 | Pendente |

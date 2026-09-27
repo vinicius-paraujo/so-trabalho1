@@ -10,14 +10,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-public final class FcfsScheduler {
+/**
+ * Prioridade não preemptiva. Valores numéricos maiores representam prioridades maiores.
+ * Utiliza a prioridade estática, pois o aging é exigido somente no Round-Robin prioritário.
+ */
+public final class NonPreemptivePriorityScheduler {
     private final Random random;
 
-    public FcfsScheduler() {
+    public NonPreemptivePriorityScheduler() {
         this(new Random());
     }
 
-    public FcfsScheduler(Random random) {
+    public NonPreemptivePriorityScheduler(Random random) {
         this.random = Objects.requireNonNull(random, "A fonte aleatória é obrigatória.");
     }
 
@@ -38,10 +42,11 @@ public final class FcfsScheduler {
                 continue;
             }
 
-            ProcessControlBlock runningProcess = selectNextProcess(readyProcesses);
+            ProcessControlBlock runningProcess = selectHighestPriority(readyProcesses);
             readyProcesses.remove(runningProcess);
             runningProcess.markRunning();
 
+            // Sem preempção: mesmo um processo mais prioritário aguarda o término do atual.
             while (runningProcess.remainingTime() > 0) {
                 timeline.add(runningProcess.id());
                 runningProcess.executeOneSecond();
@@ -56,22 +61,22 @@ public final class FcfsScheduler {
         return new SchedulingResult(timeline, processes);
     }
 
-    private ProcessControlBlock selectNextProcess(List<ProcessControlBlock> readyProcesses) {
-        int earliestArrival = Integer.MAX_VALUE;
+    private ProcessControlBlock selectHighestPriority(List<ProcessControlBlock> readyProcesses) {
+        int highestPriority = Integer.MIN_VALUE;
         for (ProcessControlBlock process : readyProcesses) {
-            earliestArrival = Math.min(earliestArrival, process.arrivalTime());
+            highestPriority = Math.max(highestPriority, process.staticPriority());
         }
 
         int shortestRemainingTime = Integer.MAX_VALUE;
         for (ProcessControlBlock process : readyProcesses) {
-            if (process.arrivalTime() == earliestArrival) {
+            if (process.staticPriority() == highestPriority) {
                 shortestRemainingTime = Math.min(shortestRemainingTime, process.remainingTime());
             }
         }
 
         List<ProcessControlBlock> tiedProcesses = new ArrayList<>();
         for (ProcessControlBlock process : readyProcesses) {
-            if (process.arrivalTime() == earliestArrival
+            if (process.staticPriority() == highestPriority
                     && process.remainingTime() == shortestRemainingTime) {
                 tiedProcesses.add(process);
             }
