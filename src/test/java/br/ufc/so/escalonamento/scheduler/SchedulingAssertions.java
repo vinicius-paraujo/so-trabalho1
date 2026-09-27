@@ -11,13 +11,14 @@ import java.util.List;
 
 /**
  * Oráculos compartilhados pelos testes dos escalonadores. As métricas são recalculadas aqui,
- * de forma independente, até que o card T13 introduza o cálculo oficial.
+ * de forma independente de {@code MetricsCalculator}, para que um erro no cálculo oficial não
+ * seja mascarado pelos próprios testes.
  */
-final class SchedulingAssertions {
+public final class SchedulingAssertions {
     private SchedulingAssertions() {
     }
 
-    static List<ProcessControlBlock> processes(int[]... definitions) {
+    public static List<ProcessControlBlock> processes(int[]... definitions) {
         List<ProcessControlBlock> processes = new ArrayList<>();
         for (int index = 0; index < definitions.length; index++) {
             int[] definition = definitions[index];
@@ -30,7 +31,7 @@ final class SchedulingAssertions {
         return processes;
     }
 
-    static List<ProcessControlBlock> referenceProcesses() {
+    public static List<ProcessControlBlock> referenceProcesses() {
         return processes(
                 new int[] {0, 5, 2},
                 new int[] {0, 2, 3},
@@ -38,13 +39,13 @@ final class SchedulingAssertions {
                 new int[] {3, 3, 4});
     }
 
-    static void assertCompletionTimes(SchedulingResult result, Integer... expected) {
+    public static void assertCompletionTimes(SchedulingResult result, Integer... expected) {
         assertEquals(
                 Arrays.asList(expected),
                 result.processes().stream().map(ProcessControlBlock::completionTime).toList());
     }
 
-    static void assertMetrics(
+    public static void assertMetrics(
             SchedulingResult result,
             double expectedTurnaround,
             double expectedWaitingTime,
@@ -55,7 +56,7 @@ final class SchedulingAssertions {
     }
 
     /** Invariantes do CT-18, válidas para qualquer algoritmo e entrada válida. */
-    static void assertValidSimulation(List<ProcessControlBlock> input, SchedulingResult result) {
+    public static void assertValidSimulation(List<ProcessControlBlock> input, SchedulingResult result) {
         assertEquals(input.size(), result.processes().size());
 
         int busySeconds = 0;
@@ -95,14 +96,14 @@ final class SchedulingAssertions {
         }
     }
 
-    static double averageTurnaround(SchedulingResult result) {
+    public static double averageTurnaround(SchedulingResult result) {
         return result.processes().stream()
                 .mapToInt(process -> process.completionTime() - process.arrivalTime())
                 .average()
                 .orElseThrow();
     }
 
-    static double averageWaitingTime(SchedulingResult result) {
+    public static double averageWaitingTime(SchedulingResult result) {
         return result.processes().stream()
                 .mapToInt(process -> process.completionTime()
                         - process.arrivalTime()
@@ -111,7 +112,7 @@ final class SchedulingAssertions {
                 .orElseThrow();
     }
 
-    static int contextSwitches(SchedulingResult result) {
+    public static int contextSwitches(SchedulingResult result) {
         int switches = 0;
         int previousProcess = SchedulingResult.IDLE;
 

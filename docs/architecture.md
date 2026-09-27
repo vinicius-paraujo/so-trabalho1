@@ -2,7 +2,7 @@
 
 ## 1. Estado
 
-Arquitetura em definição. O enunciado integral foi incorporado e a linguagem e as ferramentas foram decididas. A estrutura definitiva de classes será fechada após a especificação dos casos de teste.
+O núcleo obrigatório está implementado: os sete algoritmos, as métricas, a saída textual e a aplicação de terminal (T01–T13). A validação integrada (T14) foi executada e aguarda a revisão cruzada da equipe. Resta definir e implementar a interface gráfica (T15).
 
 A política de documentação e decisão está registrada no [ADR 0001](adrs/0001-governanca-e-fontes-do-projeto.md).
 
@@ -114,6 +114,25 @@ O critério estrito implementa o primeiro desempate do enunciado: em empate, que
 
 As regras dos passos 4 e 5 estão justificadas no ADR 0004.
 
+### 4.8 Métricas, orquestração e saída (T13)
+
+Pacotes e fluxo de uma execução:
+
+```text
+Main ─► SchedulerApplication ─► ConfigurationParser / ProcessInputParser   (input)
+                             ─► SimulationRunner ─► 7 escalonadores         (scheduler)
+                                                 ─► MetricsCalculator       (metrics)
+                             ─► ResultFormatter                             (output)
+```
+
+- `MetricsCalculator` (`metrics`): calcula turnaround médio, espera média e trocas de contexto a partir de qualquer `SchedulingResult`. Retorna `SchedulingMetrics`, sem arredondamento. As regras são as do ADR 0004.
+- `SimulationRunner` (`simulation`): chama explicitamente os sete escalonadores, na ordem do enunciado, e produz um `AlgorithmReport` (nome, resultado e métricas) por algoritmo. Não há interface comum entre escalonadores: a lista explícita mostra quais algoritmos são executados e com quais parâmetros, e cada escalonador segue legível isoladamente. Cada algoritmo recebe uma fonte aleatória própria, obtida de um `Supplier<Random>`, o que permite reproduzir nos testes de integração os mesmos resultados dos testes unitários.
+- `ResultFormatter` (`output`): converte os relatórios no texto do ADR 0006. Não conhece regra de escalonamento.
+- `SchedulerApplication`: implementa o contrato de terminal do ADR 0005. Valida o argumento, lê configuração e processos, executa a simulação e só escreve no `stdout` depois que toda a saída foi montada. Recebe os fluxos por parâmetro, o que permite testá-la sem processo externo.
+- `Main`: cria os fluxos em UTF-8 e encerra a JVM com o código devolvido pela aplicação.
+
+`AlgorithmReport` é o ponto de integração previsto para a interface gráfica (ADR 0003): a interface poderá consumir a lista produzida por `SimulationRunner` sem reimplementar regras.
+
 ## 5. Regras arquiteturais
 
 1. A política de escalonamento não deve depender diretamente do formato de entrada ou saída.
@@ -130,7 +149,6 @@ As regras dos passos 4 e 5 estão justificadas no ADR 0004.
 
 ## 6. Decisões pendentes
 
-- tecnologia da interface gráfica;
-- estrutura definitiva de módulos e diretórios.
+- tecnologia da interface gráfica e sua integração com `SimulationRunner`.
 
 Cada decisão relevante será registrada em ADR após confronto com o enunciado e as notas do professor.

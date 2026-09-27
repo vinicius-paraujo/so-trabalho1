@@ -63,7 +63,13 @@ Devem executar cada algoritmo a partir de uma entrada completa e comparar linha 
 
 ### 4.3 Validação manual
 
-Deve executar o programa pelo Gradle Wrapper com os arquivos de `src/test/resources/cases/` e comparar a saída padrão com os resultados especificados.
+Deve executar o programa pelo Gradle Wrapper com os arquivos de `src/test/resources/cases/` e comparar a saída padrão com os resultados especificados:
+
+```bash
+./gradlew -q run --args="src/test/resources/cases/reference/config.txt" < src/test/resources/cases/reference/processes.txt
+```
+
+A saída completa esperada para o caso de referência está versionada em `src/test/resources/cases/reference/expected-output.txt`. Ela foi gerada a partir da tabela 5.1, e não pelo próprio simulador.
 
 ## 5. Caso de referência do enunciado
 
@@ -448,28 +454,57 @@ Casos acrescentados durante a implementação para fixar regras não cobertas pe
 
 ## 7. Classes de teste
 
-- `ProcessInputParserTest`.
-- `ConfigurationParserTest`.
-- `ProcessControlBlockTest`.
-- `FcfsSchedulerTest`.
-- `SjfSchedulerTest`.
-- `SrtfSchedulerTest`.
-- `NonPreemptivePrioritySchedulerTest`.
-- `PreemptivePrioritySchedulerTest`.
-- `RoundRobinSchedulerTest`.
-- `PriorityRoundRobinSchedulerTest`.
+| Classe | Escopo |
+| --- | --- |
+| `ProcessInputParserTest` | Entrada de processos (CT-07, CT-15, BOM inicial). |
+| `ConfigurationParserTest` | Arquivo de configuração (CT-16, BOM inicial). |
+| `ProcessControlBlockTest` | Transições de estado, aging e restauração de prioridade. |
+| `FcfsSchedulerTest` a `PriorityRoundRobinSchedulerTest` | Uma classe por algoritmo: caso de referência e CTs específicos. |
+| `MetricsCalculatorTest` | Médias sem arredondamento e contagem de trocas de contexto. |
+| `ResultFormatterTest` | Formato textual do ADR 0006 (CT-17). |
+| `SimulationRunnerTest` | Ordem dos sete algoritmos, métricas da tabela 5.1 e repasse de quantum e aging. |
+| `SchedulerApplicationTest` | Ponta a ponta: saída completa do caso de referência, todos os casos de `cases/` e contrato de erro. |
+| `SimulationInvariantTest` | Invariantes do CT-18 em entradas geradas com semente fixa. |
 
-Os testes dos escalonadores compartilham `SchedulingAssertions`, que recalcula métricas e trocas de contexto de forma independente e verifica as invariantes do CT-18.
+Os testes dos escalonadores compartilham `SchedulingAssertions`, que recalcula métricas e trocas de contexto de forma independente de `MetricsCalculator` e verifica as invariantes do CT-18.
 
-Previstas para os próximos cards:
-
-- `MetricsCalculatorTest`.
-- `ContextSwitchCounterTest`.
-- `SchedulerApplicationTest`.
-- `SimulationInvariantTest`.
-
-Os nomes descrevem responsabilidades de teste; não obrigam a criação de abstrações que escondam os algoritmos.
+A contagem de trocas ficou em `MetricsCalculator`; por isso, não existe `ContextSwitchCounterTest` separado.
 
 ## 8. Verificação dos oráculos
 
 Os oráculos são verificados por cálculo das métricas, invariantes gerais e casos específicos. Uma revisão por outro integrante é recomendada para reduzir erros de interpretação, mas não constitui dependência para os cards de infraestrutura.
+
+## 9. Relatório de validação integrada (T14)
+
+Data: 27/09/2026. Ambiente: Windows 11, JDK 21.0.12.1, Gradle Wrapper, PowerShell 5.1 e Git Bash.
+
+### 9.1 Automatizada
+
+`gradlew clean test` executado a partir de build limpo: 780 testes, nenhuma falha.
+
+| Verificação | Resultado |
+| --- | --- |
+| Saída completa do caso de referência igual a `expected-output.txt` | OK |
+| Os 13 casos de `cases/` produzem sete seções válidas | OK |
+| 300 entradas geradas: invariantes do CT-18 e métricas iguais ao cálculo independente, nos sete algoritmos | OK |
+| 300 entradas geradas: nenhum algoritmo obtém turnaround médio menor que o SRTF, que é ótimo para essa métrica | OK |
+| 50 entradas geradas: mesma semente produz a mesma linha do tempo | OK |
+
+### 9.2 Manual
+
+O executável gerado por `installDist` e o comando `gradlew run` foram executados com cada caso de `cases/`. As linhas do tempo e as métricas conferem com as seções 5 e 6. O caso `random-tie` varia entre execuções, como esperado, pois a execução normal não fixa semente (ADR 0004). O diagrama de exemplo do enunciado coincide com a seção `ROUND_ROBIN` do caso de referência.
+
+Caminhos de erro verificados: ausência de argumento (código 2), configuração inexistente, configuração inválida, campo não inteiro, duração zero e entrada vazia (código 1). Em todos os casos, a mensagem vai para `stderr` e o `stdout` fica vazio.
+
+### 9.3 Divergências encontradas e tratamento
+
+| Divergência | Tratamento |
+| --- | --- |
+| Acentos corrompidos em `stderr` no Windows quando o fluxo é redirecionado. | Corrigida: fluxos em UTF-8 (ADR 0005, item 15). |
+| `Get-Content processos.txt \| gradlew run` no PowerShell 5.1 rejeitava a primeira linha por causa do BOM inserido no pipe. | Corrigida: BOM inicial ignorado (ADR 0005, item 16), com testes. |
+| O exemplo do enunciado deixa em branco processos não criados ou concluídos; o ADR 0006 usa `--`. | Documentada no ADR 0006; aguarda decisão da equipe. |
+
+### 9.4 Pendente
+
+- Revisão cruzada: cada integrante deve revisar código produzido por outro integrante (critério do T14 no board).
+- Revisão independente das regras 12 a 16 do ADR 0004.

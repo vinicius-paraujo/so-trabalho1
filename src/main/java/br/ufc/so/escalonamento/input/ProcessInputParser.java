@@ -19,6 +19,9 @@ public final class ProcessInputParser {
         int lineNumber = 0;
         while ((line = reader.readLine()) != null) {
             lineNumber++;
+            if (lineNumber == 1) {
+                line = ByteOrderMark.strip(line);
+            }
             if (line.isBlank()) {
                 throw error(lineNumber, "a linha não pode estar vazia");
             }

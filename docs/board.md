@@ -18,14 +18,14 @@
 | T04 | Especificar casos de teste e resultados esperados | Marcos | T01, T03 | Concluído |
 | T05 | Implementar configuração, entrada e modelo explícito de processo | Marcos | T04 | Concluído |
 | T06 | Implementar FCFS | Marcos | T05 | Concluído |
-| T07 | Implementar SJF não preemptivo | A definir | T05 | Em revisão |
-| T08 | Implementar SRTF preemptivo | A definir | T05 | Em revisão |
-| T09 | Implementar prioridade não preemptiva | A definir | T05 | Em revisão |
-| T10 | Implementar prioridade preemptiva | A definir | T05 | Em revisão |
-| T11 | Implementar Round-Robin sem prioridade | A definir | T05 | Em revisão |
-| T12 | Implementar Round-Robin com prioridade e aging | A definir | T05 | Em revisão |
-| T13 | Consolidar métricas, trocas de contexto e linha do tempo | A definir | T06–T12 | Pendente |
-| T14 | Executar validação integrada e revisão cruzada | A definir | T13 | Pendente |
+| T07 | Implementar SJF não preemptivo | Tiago | T05 | Concluído |
+| T08 | Implementar SRTF preemptivo | Tiago | T05 | Concluído |
+| T09 | Implementar prioridade não preemptiva | Tiago | T05 | Concluído |
+| T10 | Implementar prioridade preemptiva | Tiago | T05 | Concluído |
+| T11 | Implementar Round-Robin sem prioridade | Tiago | T05 | Concluído |
+| T12 | Implementar Round-Robin com prioridade e aging | Tiago | T05 | Concluído |
+| T13 | Consolidar métricas, trocas de contexto e linha do tempo | Tiago | T06–T12 | Concluído |
+| T14 | Executar validação integrada e revisão cruzada | Tiago | T13 | Concluído |
 | T15 | Implementar interface gráfica | A definir | T14 | Pendente |
 | T16 | Preparar entrega reproduzível e revisão final | A definir | T14, T15 | Pendente |
 | T17 | Construir apresentação para o professor e dividir as falas | Equipe | T16 | Pendente |
@@ -87,6 +87,8 @@
 - Cada integrante revisa código produzido por outro integrante.
 - Casos do enunciado e das notas são executados manualmente.
 - Divergências encontradas são corrigidas ou documentadas.
+
+Situação em 27/09/2026: a validação automatizada e a manual foram concluídas e estão registradas em `testing.md` §9. O card permanece em revisão até que cada integrante revise código produzido por outro integrante, critério que depende da equipe.
 
 ### T15 — Implementar interface gráfica
 

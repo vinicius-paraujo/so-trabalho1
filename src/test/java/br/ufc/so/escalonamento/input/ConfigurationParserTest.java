@@ -38,6 +38,17 @@ class ConfigurationParserTest {
     }
 
     @Test
+    void deveIgnorarBomNoInicioDoArquivo() throws IOException {
+        Path configurationFile = temporaryDirectory.resolve("config-bom.txt");
+        Files.writeString(configurationFile, "﻿quantum:3\r\naging:1\r\n");
+
+        SchedulerConfiguration configuration = parser.parse(configurationFile);
+
+        assertEquals(3, configuration.quantum());
+        assertEquals(1, configuration.agingRate());
+    }
+
+    @Test
     void deveLerConfiguracaoDeArquivo() throws IOException {
         Path configurationFile = temporaryDirectory.resolve("config.txt");
         Files.writeString(configurationFile, "quantum:2\naging:1");

@@ -24,6 +24,12 @@ O enunciado define os campos dos processos e da configuração, mas não determi
 12. Linhas vazias, chaves desconhecidas, chaves duplicadas, valores ausentes e valores não inteiros são inválidos.
 13. Uma entrada inválida deve produzir mensagem objetiva em `stderr` e encerramento diferente de zero, sem resultado parcial.
 
+### Complemento de 27/09/2026 (T13–T14)
+
+14. Códigos de encerramento: `0` para sucesso, `1` para configuração ou entrada inválida (inclusive arquivo inexistente ou ilegível) e `2` para quantidade incorreta de argumentos.
+15. A entrada padrão é lida em UTF-8, e `stdout` e `stderr` são escritos em UTF-8 em qualquer sistema operacional. Na validação manual, o Windows usou a codificação legada quando os fluxos estavam redirecionados, o que corrompia os acentos das mensagens de erro.
+16. Um BOM UTF-8 no início da entrada de processos ou do arquivo de configuração é ignorado. O Windows PowerShell 5.1 insere esse marcador ao encaminhar texto para programas externos (`Get-Content processos.txt | ...`), e o Bloco de Notas pode gravá-lo em arquivos. Sem essa regra, a primeira linha de uma entrada válida seria rejeitada. Um BOM em qualquer outra posição continua inválido.
+
 ## Consequências
 
 - O contrato pode ser validado antes da execução dos algoritmos.

@@ -25,6 +25,11 @@ application {
     mainClass = 'br.ufc.so.escalonamento.Main'
 }
 
+// Os processos são lidos de stdin (ADR 0005); sem isso, o Gradle não repassa a entrada.
+tasks.named('run') {
+    standardInput = System.in
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }

@@ -25,17 +25,30 @@ No Linux ou WSL:
 
 ## Execução
 
-No Windows:
+O único argumento é o caminho do arquivo de configuração (`quantum` e `aging`). Os processos são lidos da entrada padrão, um por linha: `criacao duracao prioridade`.
+
+No Windows (PowerShell):
 
 ```powershell
-.\gradlew.bat run
+Get-Content processos.txt | .\gradlew.bat -q run --args="config.txt"
 ```
 
 No Linux ou WSL:
 
 ```bash
-./gradlew run
+./gradlew -q run --args="config.txt" < processos.txt
 ```
+
+Também é possível gerar um executável independente do Gradle:
+
+```bash
+./gradlew installDist
+build/install/simulador-escalonamento/bin/simulador-escalonamento config.txt < processos.txt
+```
+
+Exemplos de entrada estão em `src/test/resources/cases/`. A saída esperada completa do caso do enunciado está em `src/test/resources/cases/reference/expected-output.txt`.
+
+Códigos de saída: `0` para sucesso, `1` para configuração ou entrada inválida e `2` para uso incorreto. Os erros são escritos em `stderr`, sem resultado parcial em `stdout`.
 
 ## Documentação
 

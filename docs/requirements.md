@@ -121,7 +121,9 @@ A ordem obrigatória é:
 
 O enunciado não define integralmente o contrato de terminal. A equipe decidiu que o caminho da configuração será o único argumento, conforme ADR 0005, e fixou a saída textual no ADR 0006.
 
-As convenções de identificação, tempo, métricas, trocas de contexto, CPU ociosa e aleatoriedade estão propostas no ADR 0004 e aguardam revisão independente.
+As convenções de identificação, tempo, métricas, trocas de contexto, CPU ociosa e aleatoriedade estão registradas no ADR 0004. As regras 12 a 16 foram acrescentadas durante a implementação dos algoritmos e aguardam revisão independente da equipe.
+
+Os requisitos RF-01 a RF-11 estão implementados e validados (ver `testing.md` §9). O RF-12 é atendido por `architecture.md` e pelos ADRs, e será consolidado no documento de entrega (T16).
 
 ## 10. Interface gráfica
 

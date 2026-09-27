@@ -30,6 +30,27 @@ tempo P1 P2
 6. Cada linha corresponderá exatamente a um intervalo de um segundo.
 7. Uma linha vazia separará as seções dos algoritmos.
 
+### Complemento de 27/09/2026 (T13)
+
+8. Os nomes das seções, na ordem do enunciado, são:
+
+   | Algoritmo do enunciado | Rótulo |
+   | --- | --- |
+   | FCFS | `FCFS` |
+   | Shortest Job First | `SJF` |
+   | Shortest Remaining Time First | `SRTF` |
+   | Por prioridade, sem preempção | `PRIORIDADE_SEM_PREEMPCAO` |
+   | Por prioridade, com preempção por prioridade | `PRIORIDADE_COM_PREEMPCAO` |
+   | Round-Robin com quantum, sem prioridade | `ROUND_ROBIN` |
+   | Round-robin com prioridade e envelhecimento | `ROUND_ROBIN_PRIORIDADE_AGING` |
+
+   Os rótulos não têm espaços nem acentos, para que a saída possa ser processada por ferramentas simples.
+9. As linhas são separadas por `\n` em qualquer sistema operacional, para que a saída seja idêntica byte a byte entre os ambientes da equipe.
+
+### Divergência conhecida em relação ao exemplo do enunciado
+
+No diagrama de exemplo do enunciado, as colunas de processos ainda não criados ou já concluídos aparecem em branco, e `--` indica apenas o processo que aguarda na fila. Pelo item 4 desta decisão, `--` significa "não executou neste segundo", sem essa distinção. A mudança é localizada em `ResultFormatter` e poderá ser feita se a equipe ou o professor preferirem a notação do exemplo.
+
 ## Consequências
 
 - A saída permanece legível e próxima ao exemplo do enunciado.

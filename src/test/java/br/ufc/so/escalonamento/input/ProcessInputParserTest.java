@@ -31,6 +31,22 @@ class ProcessInputParserTest {
         assertEquals(1, processes.get(2).arrivalTime());
     }
 
+    @Test
+    void deveIgnorarBomNoInicioDaEntrada() throws IOException {
+        List<ProcessControlBlock> processes = parser.parse(new StringReader("﻿0 5 2\r\n0 2 3\r\n"));
+
+        assertEquals(2, processes.size());
+        assertEquals(0, processes.get(0).arrivalTime());
+        assertEquals(5, processes.get(0).duration());
+    }
+
+    @Test
+    void deveRejeitarBomForaDoInicioDaEntrada() {
+        assertThrows(
+                InputValidationException.class,
+                () -> parser.parse(new StringReader("0 5 2\n﻿0 2 3")));
+    }
+
     @ParameterizedTest(name = "{0}")
     @MethodSource("invalidInputs")
     void deveRejeitarEntradasInvalidas(String description, String input) {
