@@ -15,7 +15,7 @@ A interface não pode comprometer a correção dos algoritmos nem duplicar regra
 1. A solução terá interface gráfica.
 2. A interface será implementada após a validação do núcleo obrigatório.
 3. A camada gráfica consumirá os resultados da simulação sem conter regras de seleção, preempção, aging ou cálculo de métricas.
-4. A tecnologia gráfica será definida em decisão posterior, antes do início de sua implementação.
+4. A tecnologia gráfica será definida em decisão posterior, antes do início de sua implementação. Definida no [ADR 0007](0007-tecnologia-da-interface-grafica.md): Swing.
 
 ## Consequências
 

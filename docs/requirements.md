@@ -117,14 +117,14 @@ A ordem obrigatória é:
 | RQ-05 | Documentar decisões relevantes. | Decisões com impacto em comportamento, arquitetura, testes ou apresentação possuem registro explícito. |
 | RQ-06 | Preservar legibilidade. | Abstrações e padrões somente são adotados quando não ocultam o fluxo teórico. |
 
-## 9. Decisões ainda necessárias
+## 9. Pontos não definidos pelo enunciado e decisões da equipe
 
-O enunciado não define integralmente o contrato de terminal. A equipe decidiu que o caminho da configuração será o único argumento, conforme ADR 0005, e fixou a saída textual no ADR 0006.
+O enunciado não define integralmente o contrato de terminal. A equipe decidiu que o caminho da configuração é o único argumento (ADR 0005) e fixou a saída textual no ADR 0006.
 
-As convenções de identificação, tempo, métricas, trocas de contexto, CPU ociosa e aleatoriedade estão registradas no ADR 0004. As regras 12 a 16 foram acrescentadas durante a implementação dos algoritmos e aguardam revisão independente da equipe.
+As convenções de identificação, tempo, métricas, trocas de contexto, CPU ociosa e aleatoriedade estão registradas no ADR 0004. As regras 12 a 16 foram acrescentadas durante a implementação dos algoritmos e aprovadas pela equipe em 27/09/2026.
 
-Os requisitos RF-01 a RF-11 estão implementados e validados (ver `testing.md` §9). O RF-12 é atendido por `architecture.md` e pelos ADRs, e será consolidado no documento de entrega (T16).
+Os requisitos RF-01 a RF-11 estão implementados e validados (ver `testing.md` §9). O RF-12 é atendido pelo [documento técnico](documento-tecnico.md), que consolida classes, estruturas de dados, decisões e padrões, e pelos comentários do código.
 
 ## 10. Interface gráfica
 
-Embora opcional no enunciado, a interface gráfica foi incorporada ao escopo pela equipe. Sua implementação ocorrerá depois que todos os requisitos obrigatórios estiverem concluídos e validados. A decisão está registrada no ADR 0003.
+Embora opcional no enunciado, a interface gráfica foi incorporada ao escopo pela equipe (ADR 0003). Ela foi implementada em Swing após a validação dos requisitos obrigatórios (ADR 0007). Exibe a entrada editável, a comparação entre os sete algoritmos e, para cada um, métricas, resultado por processo e diagrama de Gantt animado.

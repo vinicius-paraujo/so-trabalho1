@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
+/** Ponto de entrada da aplicação de terminal (ADR 0005); a interface gráfica usa {@code GuiMain}. */
 public final class Main {
     private Main() {
     }

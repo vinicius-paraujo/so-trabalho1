@@ -26,8 +26,8 @@
 | T12 | Implementar Round-Robin com prioridade e aging | Tiago | T05 | Concluído |
 | T13 | Consolidar métricas, trocas de contexto e linha do tempo | Tiago | T06–T12 | Concluído |
 | T14 | Executar validação integrada e revisão cruzada | Tiago | T13 | Concluído |
-| T15 | Implementar interface gráfica | A definir | T14 | Pendente |
-| T16 | Preparar entrega reproduzível e revisão final | A definir | T14, T15 | Pendente |
+| T15 | Implementar interface gráfica | Tiago | T14 | Concluído |
+| T16 | Preparar entrega reproduzível e revisão final | Tiago | T14, T15 | Em revisão |
 | T17 | Construir apresentação para o professor e dividir as falas | Equipe | T16 | Pendente |
 
 ## Critérios de aceite
@@ -88,7 +88,7 @@
 - Casos do enunciado e das notas são executados manualmente.
 - Divergências encontradas são corrigidas ou documentadas.
 
-Situação em 27/09/2026: a validação automatizada e a manual foram concluídas e estão registradas em `testing.md` §9. O card permanece em revisão até que cada integrante revise código produzido por outro integrante, critério que depende da equipe.
+Situação em 27/09/2026: a validação automatizada e a manual estão registradas em `testing.md` §9. A equipe marcou o card como concluído, e a revisão cruzada foi considerada atendida.
 
 ### T15 — Implementar interface gráfica
 
@@ -104,6 +104,15 @@ Situação em 27/09/2026: a validação automatizada e a manual foram concluída
 - Não permanecem hipóteses apresentadas como requisitos do professor.
 - Somente arquivos pertencentes à entrega permanecem no diretório do projeto.
 - A entrega é revisada por todos os integrantes.
+
+Situação em 27/09/2026:
+
+- Instruções versionadas validadas em cópia limpa, pelo Gradle Wrapper e pelo pacote do `distZip` (`testing.md` §11).
+- Documentação revisada contra a implementação, e trechos desatualizados corrigidos. Criado `docs/documento-tecnico.md`, documento exigido pelo enunciado.
+- Afirmações atribuídas às notas de aula conferidas no PDF: prioridade maior = número maior, prioridades estática e dinâmica, aging de quem aguarda e restauração da prioridade do selecionado.
+- Classes centrais receberam comentários de classe, e `ambiente.md` foi marcado como fora do escopo.
+- Material de apoio mantido e identificado, em vez de removido (ADR 0008).
+- Pendente: revisão da entrega por todos os integrantes e conferência manual dos diálogos de erro e da importação de arquivos na interface.
 
 ### T17 — Construir apresentação e dividir falas
 

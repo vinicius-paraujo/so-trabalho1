@@ -51,6 +51,8 @@ tempo P1 P2
 
 No diagrama de exemplo do enunciado, as colunas de processos ainda não criados ou já concluídos aparecem em branco, e `--` indica apenas o processo que aguarda na fila. Pelo item 4 desta decisão, `--` significa "não executou neste segundo", sem essa distinção. A mudança é localizada em `ResultFormatter` e poderá ser feita se a equipe ou o professor preferirem a notação do exemplo.
 
+A equipe manteve a notação desta decisão na saída textual. A interface gráfica (ADR 0007) exibe a distinção completa: não criado, pronto, executando e terminado.
+
 ## Consequências
 
 - A saída permanece legível e próxima ao exemplo do enunciado.

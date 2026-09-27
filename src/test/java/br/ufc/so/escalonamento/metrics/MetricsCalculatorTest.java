@@ -39,6 +39,14 @@ class MetricsCalculatorTest {
     }
 
     @Test
+    void deveCalcularTurnaroundEEsperaDeCadaProcesso() {
+        ProcessControlBlock process = terminated(3, 1, 4, 11);
+
+        assertEquals(10, calculator.turnaround(process));
+        assertEquals(6, calculator.waitingTime(process));
+    }
+
+    @Test
     void naoDeveContarCargaInicialNemContinuidadeComoTroca() {
         assertEquals(0, calculator.contextSwitches(List.of(1, 1, 1)));
     }

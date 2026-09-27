@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Converte cada linha {@code criacao duracao prioridade} em um PCB. Os identificadores seguem a
+ * ordem das linhas, mesmo que a entrada não esteja ordenada por criação (ADR 0005).
+ */
 public final class ProcessInputParser {
     public List<ProcessControlBlock> parse(Reader source) throws IOException {
         Objects.requireNonNull(source, "A fonte dos processos é obrigatória.");

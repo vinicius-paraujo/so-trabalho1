@@ -30,8 +30,37 @@ tasks.named('run') {
     standardInput = System.in
 }
 
+// Interface gráfica (ADR 0007): ponto de entrada separado, sem alterar o contrato de terminal.
+def guiMainClass = 'br.ufc.so.escalonamento.gui.GuiMain'
+
+tasks.register('runGui', JavaExec) {
+    group = 'application'
+    description = 'Executa a interface gráfica do simulador.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = guiMainClass
+}
+
+def guiStartScripts = tasks.register('guiStartScripts', CreateStartScripts) {
+    applicationName = 'simulador-escalonamento-gui'
+    mainClass = guiMainClass
+    outputDir = layout.buildDirectory.dir('gui-scripts').get().asFile
+    classpath = files(tasks.named('jar')) + configurations.runtimeClasspath
+}
+
+distributions {
+    main {
+        contents {
+            from(guiStartScripts) {
+                into 'bin'
+            }
+        }
+    }
+}
+
 tasks.named('test') {
     useJUnitPlatform()
+    // Os testes da interface desenham em memória, sem abrir janelas.
+    systemProperty 'java.awt.headless', 'true'
 }
 
 tasks.withType(JavaCompile).configureEach {

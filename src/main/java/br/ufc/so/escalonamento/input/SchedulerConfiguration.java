@@ -1,5 +1,6 @@
 package br.ufc.so.escalonamento.input;
 
+/** Quantum e taxa de aging já validados; compartilhados pelos dois algoritmos Round-Robin. */
 public record SchedulerConfiguration(int quantum, int agingRate) {
     public SchedulerConfiguration {
         if (quantum <= 0) {

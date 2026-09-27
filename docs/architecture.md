@@ -2,7 +2,9 @@
 
 ## 1. Estado
 
-O núcleo obrigatório está implementado: os sete algoritmos, as métricas, a saída textual e a aplicação de terminal (T01–T13). A validação integrada (T14) foi executada e aguarda a revisão cruzada da equipe. Resta definir e implementar a interface gráfica (T15).
+O núcleo obrigatório está implementado e validado: os sete algoritmos, as métricas, a saída textual e a aplicação de terminal (T01–T14). A interface gráfica em Swing (T15, ADR 0007) consome o mesmo núcleo. Restam a preparação da entrega (T16) e a apresentação (T17).
+
+A escolha da tecnologia gráfica está registrada no [ADR 0007](adrs/0007-tecnologia-da-interface-grafica.md).
 
 A política de documentação e decisão está registrada no [ADR 0001](adrs/0001-governanca-e-fontes-do-projeto.md).
 
@@ -31,7 +33,7 @@ O contrato de entrada e a saída textual estão registrados nos [ADRs 0005](adrs
 
 ## 4. Responsabilidades conceituais
 
-As responsabilidades abaixo orientam a análise, mas ainda não determinam arquivos, classes ou módulos:
+As responsabilidades abaixo orientaram a análise. As seções 4.1 a 4.9 indicam as classes que as implementam:
 
 - representação de processo e de seus atributos;
 - coleção de processos prontos;
@@ -131,7 +133,28 @@ Main ─► SchedulerApplication ─► ConfigurationParser / ProcessInputParser
 - `SchedulerApplication`: implementa o contrato de terminal do ADR 0005. Valida o argumento, lê configuração e processos, executa a simulação e só escreve no `stdout` depois que toda a saída foi montada. Recebe os fluxos por parâmetro, o que permite testá-la sem processo externo.
 - `Main`: cria os fluxos em UTF-8 e encerra a JVM com o código devolvido pela aplicação.
 
-`AlgorithmReport` é o ponto de integração previsto para a interface gráfica (ADR 0003): a interface poderá consumir a lista produzida por `SimulationRunner` sem reimplementar regras.
+`AlgorithmReport` é o ponto de integração da interface gráfica (ADR 0003): a interface consome a lista produzida por `SimulationRunner` sem reimplementar regras.
+
+### 4.9 Interface gráfica (T15)
+
+Pacote `gui`, em Swing (ADR 0007), com ponto de entrada próprio:
+
+```text
+GuiMain ─► SchedulerWindow ─► ProcessTableModel ─► ProcessInputParser        (validação)
+                           ─► SimulationRunner  ─► List<AlgorithmReport>      (mesmo núcleo)
+                           ─► ComparisonPanel   (ComparisonTableModel + gráfico de barras)
+                           ─► AlgorithmPanel ×7 (GanttChartPanel + ProcessResultTableModel)
+```
+
+- `SchedulerWindow`: tabela editável de processos, quantum, aging, semente opcional, importação de arquivos de processos e de configuração e botão de simulação. Mostra os erros de validação em diálogo, com as mesmas mensagens da aplicação de terminal.
+- `ProcessTableModel`: converte as linhas da tabela em texto e o entrega ao `ProcessInputParser`, reaproveitando as regras do ADR 0005.
+- `AlgorithmPanel`: uma aba por algoritmo, com descrição da regra, métricas, diagrama de Gantt e resultado por processo. Os controles Reproduzir, Pausar, Passo, Reiniciar e Mostrar tudo, e a velocidade, animam o diagrama com um `javax.swing.Timer`.
+- `GanttChartPanel`: desenha uma linha por processo e uma linha da CPU. Mostra execução, espera e criação, e marca a CPU ociosa. A quantidade de segundos visíveis controla a animação.
+- `TimelinePresentation`: agrupa a linha do tempo em segmentos contínuos e deriva o estado exibido de cada processo a partir da criação, da conclusão e da linha do tempo. Não depende de Swing.
+- `ComparisonPanel` e `ComparisonTableModel`: métricas dos sete algoritmos lado a lado, com o melhor valor de cada coluna em negrito, e um gráfico de barras de tt e tw.
+- `ProcessResultTableModel`: conclusão, turnaround e espera por processo, calculados por `MetricsCalculator.turnaround` e `MetricsCalculator.waitingTime`.
+
+Os componentes Swing são classes finais e anotadas com `@SuppressWarnings("serial")`, pois não são serializados. A anotação evita que os avisos de serialização do `-Xlint:all -Werror` bloqueiem a compilação.
 
 ## 5. Regras arquiteturais
 
@@ -149,6 +172,4 @@ Main ─► SchedulerApplication ─► ConfigurationParser / ProcessInputParser
 
 ## 6. Decisões pendentes
 
-- tecnologia da interface gráfica e sua integração com `SimulationRunner`.
-
-Cada decisão relevante será registrada em ADR após confronto com o enunciado e as notas do professor.
+Nenhuma decisão arquitetural pendente. Mudanças futuras devem ser registradas em ADR após confronto com o enunciado e as notas do professor (ADR 0001).

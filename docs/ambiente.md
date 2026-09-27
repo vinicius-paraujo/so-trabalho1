@@ -1,5 +1,7 @@
 # Configuração do ambiente com WSL
 
+> **Fora do escopo do simulador de escalonamento.** Este documento trata do EDK II, da aplicação UEFI e do protokernel, material de apoio da disciplina. O simulador precisa apenas do JDK 21 e do Gradle Wrapper, conforme o `README.md`. O arquivo foi mantido no repositório por decisão da equipe (ADR 0008).
+
 ## 1. Objetivo
 
 Descrever a preparação de uma máquina Windows para compilar o EDK II, construir a aplicação UEFI do trabalho e executá-la com QEMU por meio do WSL 2.

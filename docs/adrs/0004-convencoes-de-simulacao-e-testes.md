@@ -8,7 +8,7 @@
 
 O enunciado define algoritmos, entradas, métricas e desempates, mas não especifica todas as convenções necessárias para produzir resultados determinísticos. Sem essas convenções, implementações corretas podem divergir na linha do tempo, na contagem de trocas ou na saída numérica.
 
-## Decisão proposta
+## Decisão
 
 1. O simulador utilizará tempo discreto e registrará um processo por intervalo `[t, t + 1)`.
 2. Processos serão identificados pela ordem das linhas originais da entrada.

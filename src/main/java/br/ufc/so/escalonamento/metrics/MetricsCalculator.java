@@ -20,23 +20,32 @@ public final class MetricsCalculator {
     }
 
     /** turnaround = conclusão - criação. */
+    public int turnaround(ProcessControlBlock process) {
+        requireTerminated(List.of(process));
+        return process.completionTime() - process.arrivalTime();
+    }
+
+    /** espera = turnaround - duração. */
+    public int waitingTime(ProcessControlBlock process) {
+        return turnaround(process) - process.duration();
+    }
+
     public double averageTurnaround(List<ProcessControlBlock> processes) {
         requireTerminated(processes);
 
         long totalTurnaround = 0;
         for (ProcessControlBlock process : processes) {
-            totalTurnaround += process.completionTime() - process.arrivalTime();
+            totalTurnaround += turnaround(process);
         }
         return (double) totalTurnaround / processes.size();
     }
 
-    /** espera = turnaround - duração. */
     public double averageWaitingTime(List<ProcessControlBlock> processes) {
         requireTerminated(processes);
 
         long totalWaitingTime = 0;
         for (ProcessControlBlock process : processes) {
-            totalWaitingTime += process.completionTime() - process.arrivalTime() - process.duration();
+            totalWaitingTime += waitingTime(process);
         }
         return (double) totalWaitingTime / processes.size();
     }

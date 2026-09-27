@@ -465,6 +465,7 @@ Casos acrescentados durante a implementação para fixar regras não cobertas pe
 | `SimulationRunnerTest` | Ordem dos sete algoritmos, métricas da tabela 5.1 e repasse de quantum e aging. |
 | `SchedulerApplicationTest` | Ponta a ponta: saída completa do caso de referência, todos os casos de `cases/` e contrato de erro. |
 | `SimulationInvariantTest` | Invariantes do CT-18 em entradas geradas com semente fixa. |
+| `gui.*Test` | Apresentação da interface gráfica; ver §10. |
 
 Os testes dos escalonadores compartilham `SchedulingAssertions`, que recalcula métricas e trocas de contexto de forma independente de `MetricsCalculator` e verifica as invariantes do CT-18.
 
@@ -502,9 +503,42 @@ Caminhos de erro verificados: ausência de argumento (código 2), configuração
 | --- | --- |
 | Acentos corrompidos em `stderr` no Windows quando o fluxo é redirecionado. | Corrigida: fluxos em UTF-8 (ADR 0005, item 15). |
 | `Get-Content processos.txt \| gradlew run` no PowerShell 5.1 rejeitava a primeira linha por causa do BOM inserido no pipe. | Corrigida: BOM inicial ignorado (ADR 0005, item 16), com testes. |
-| O exemplo do enunciado deixa em branco processos não criados ou concluídos; o ADR 0006 usa `--`. | Documentada no ADR 0006; aguarda decisão da equipe. |
+| O exemplo do enunciado deixa em branco processos não criados ou concluídos; o ADR 0006 usa `--`. | Documentada no ADR 0006. A equipe manteve `--` na saída textual; a interface gráfica exibe a distinção completa (ADR 0007). |
 
 ### 9.4 Pendente
 
-- Revisão cruzada: cada integrante deve revisar código produzido por outro integrante (critério do T14 no board).
-- Revisão independente das regras 12 a 16 do ADR 0004.
+A revisão cruzada foi considerada atendida pela equipe, que marcou o T14 como concluído em 27/09/2026.
+
+## 10. Testes da interface gráfica (T15)
+
+Os testes rodam em modo headless (`java.awt.headless=true`, configurado no `build.gradle`) e não abrem janelas.
+
+| Classe | Escopo |
+| --- | --- |
+| `TimelinePresentationTest` | Agrupamento em segmentos, CPU ociosa e estado exibido (não criado, pronto, executando, terminado). |
+| `ProcessTableModelTest` | Edição, inclusão, remoção com renumeração, importação e validação pelas regras do ADR 0005. |
+| `ResultTableModelsTest` | Tabela comparativa, empates no melhor valor e resultado por processo. |
+| `GanttChartPanelTest` | Renderização em memória: cores das células de execução, espera e células vazias, ocultação dos segundos não revelados e desenho dos painéis das abas. |
+
+Verificação manual realizada em 27/09/2026:
+
+- `simulador-escalonamento-gui`, gerado por `installDist`, abre a janela sem erros;
+- as abas do caso de referência exibem as mesmas métricas e linhas do tempo da tabela 5.1;
+- a comparação destaca SJF e SRTF como melhores em tt e tw.
+
+Janela, botões, diálogos e animação não possuem teste automatizado (ADR 0007). A conferência feita no T16 está na §11.
+
+## 11. Validação da entrega (T16)
+
+Data: 27/09/2026. A validação foi feita sobre uma cópia limpa do repositório, contendo somente os arquivos versionados, sem `build/` nem `.gradle/`.
+
+| Verificação | Resultado |
+| --- | --- |
+| `gradlew clean test distZip javadoc` | OK: 803 testes, nenhuma falha; Javadoc gerado sem erros. |
+| `Get-Content processos.txt \| .\gradlew.bat -q run --args=...` (PowerShell), conforme o README | Saída idêntica a `expected-output.txt`. |
+| `./gradlew -q run --args=... < processos.txt` (Bash), conforme o README | Saída idêntica a `expected-output.txt`. |
+| Pacote do `distZip` descompactado: `bin/simulador-escalonamento` e `.bat` | Saída idêntica a `expected-output.txt`. |
+| Pacote do `distZip`: `bin/simulador-escalonamento-gui.bat` | Janela aberta sem erros. |
+| Interface acionada pelos próprios componentes: Reiniciar, 4 × Passo, Reproduzir e Pausar, Mostrar tudo, edição da tabela, Adicionar, Simular, Exemplo do enunciado | Comportamento esperado; animação pausada em `t = 8 / 14 s` com o cursor na posição correta. |
+
+Conferência manual restante: os diálogos de erro (valor inválido na tabela) e o seletor de arquivos do menu **Arquivo**. Por serem modais, não foram acionados por script.

@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+/**
+ * First Come, First Served: executa o pronto de criação mais antiga até o fim, sem preempção.
+ * Empates de criação seguem os critérios do enunciado: menor tempo restante e, por fim, sorteio.
+ */
 public final class FcfsScheduler {
     private final Random random;
 

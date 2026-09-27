@@ -1,5 +1,6 @@
 package br.ufc.so.escalonamento.metrics;
 
+/** Métricas exigidas pelo enunciado para um algoritmo, sem arredondamento. */
 public record SchedulingMetrics(
         double averageTurnaround,
         double averageWaitingTime,
