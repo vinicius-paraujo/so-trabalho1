@@ -2,11 +2,11 @@
 
 Trabalho 01 da disciplina CK0234 — Sistemas Operacionais (UFC).
 
-Este documento atende ao enunciado: *"documento explicando as decisões de implementação utilizadas (classes, estruturas de dados utilizadas, padrões de projeto (se for o caso))"* e descreve a estrutura de controle de cada processo. Os detalhes de cada decisão estão nos ADRs de `docs/adrs/`, e os casos de teste, em `docs/testing.md`.
+Este documento descreve a implementação do simulador: as classes, as estruturas de dados, a estrutura de controle de cada processo e os padrões de projeto utilizados. Os detalhes de cada decisão estão nos ADRs de `docs/adrs/`, e os casos de teste, em `docs/testing.md`.
 
 ## 1. Visão geral
 
-O simulador lê um conjunto de processos da entrada padrão e um arquivo com `quantum` e `aging`, executa os sete algoritmos exigidos sobre a mesma entrada e apresenta, para cada um:
+O simulador lê um conjunto de processos da entrada padrão e um arquivo com `quantum` e `aging`, executa os sete algoritmos sobre a mesma entrada e apresenta, para cada um:
 
 - turnaround médio (`tt`);
 - espera média (`tw`);
@@ -61,7 +61,7 @@ Dependências entre pacotes:
 
 ## 3. Estrutura de controle do processo (PCB)
 
-Cada processo é representado por `domain.ProcessControlBlock`, conforme a sugestão do enunciado ("estrutura que mapeie informações para controle, como id, status, prioridade").
+Cada processo é representado por `domain.ProcessControlBlock`, que reúne sua identificação, seus tempos, suas prioridades e seu estado.
 
 | Campo | Tipo | Mutável | Significado |
 | --- | --- | --- | --- |
@@ -192,7 +192,7 @@ Origem das regras:
 
 ## 6. Desempates e aleatoriedade
 
-Ordem exigida pelo enunciado, aplicada por todos os algoritmos com critério de seleção:
+Ordem de desempate aplicada por todos os algoritmos com critério de seleção:
 
 1. **Processo que já ocupa a CPU.** Implementado pela preempção somente diante de candidato estritamente melhor. Nos não preemptivos, não há processo na CPU no momento da escolha.
 2. **Menor tempo restante.** Segunda passagem sobre os empatados.
@@ -301,5 +301,5 @@ Os resultados esperados foram definidos antes das implementações (`docs/testin
 - O tempo é discreto, em segundos inteiros, como na entrada do enunciado.
 - O custo da troca de contexto não é simulado; as trocas são apenas contadas.
 - Não há operações de entrada e saída nem estado bloqueado.
-- A escolha aleatória, fora dos testes, pode variar entre execuções, como exige o enunciado.
+- A escolha aleatória, fora dos testes, pode variar entre execuções.
 - A janela, os botões e a animação da interface são verificados manualmente; a lógica de apresentação e o desenho do diagrama têm testes automatizados.
