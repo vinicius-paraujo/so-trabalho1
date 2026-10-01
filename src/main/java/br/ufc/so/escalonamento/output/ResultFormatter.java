@@ -6,10 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-/**
- * Produz a saída textual definida no ADR 0006. As linhas são separadas por '\n' em qualquer
- * sistema operacional, para que a saída seja idêntica entre os ambientes da equipe.
- */
+/** Formata métricas e linha do tempo com separador {@code '\n'} independente da plataforma. */
 public final class ResultFormatter {
     static final String RUNNING = "##";
     static final String NOT_RUNNING = "--";
@@ -46,7 +43,6 @@ public final class ResultFormatter {
         List<Integer> timeline = report.result().timeline();
         for (int instant = 0; instant < timeline.size(); instant++) {
             section.append(instant).append('-').append(instant + 1);
-            // Um instante ocioso não coincide com nenhum identificador e produz somente "--".
             for (ProcessControlBlock process : processes) {
                 section.append(' ').append(timeline.get(instant) == process.id() ? RUNNING : NOT_RUNNING);
             }

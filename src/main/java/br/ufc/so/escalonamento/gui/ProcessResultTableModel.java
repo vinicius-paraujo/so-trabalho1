@@ -5,8 +5,8 @@ import br.ufc.so.escalonamento.metrics.MetricsCalculator;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
-/** Resultado individual de cada processo em um algoritmo. */
-@SuppressWarnings("serial") // Componentes Swing deste projeto não são serializados.
+/** Expõe conclusão, turnaround e espera por processo. */
+@SuppressWarnings("serial")
 public final class ProcessResultTableModel extends AbstractTableModel {
     private static final String[] COLUMN_NAMES = {
         "Processo", "Criação", "Duração", "Prioridade", "Conclusão", "Turnaround", "Espera"

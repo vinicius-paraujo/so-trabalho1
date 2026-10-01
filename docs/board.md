@@ -27,8 +27,8 @@
 | T13 | Consolidar métricas, trocas de contexto e linha do tempo | Tiago | T06–T12 | Concluído |
 | T14 | Executar validação integrada e revisão cruzada | Tiago | T13 | Concluído |
 | T15 | Implementar interface gráfica | Tiago | T14 | Concluído |
-| T16 | Preparar entrega reproduzível e revisão final | Tiago | T14, T15 | Em revisão |
-| T17 | Construir apresentação para o professor e dividir as falas | Equipe | T16 | Pendente |
+| T16 | Preparar entrega reproduzível e revisão final | Tiago, Marcos | T14, T15 | Concluído |
+| T17 | Construir apresentação para o professor e dividir as falas | Thiago, Marcos | T16 | Concluído |
 
 ## Critérios de aceite
 

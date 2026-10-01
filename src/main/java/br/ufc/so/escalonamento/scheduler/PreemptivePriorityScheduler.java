@@ -10,10 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-/**
- * Prioridade preemptiva. Valores numéricos maiores representam prioridades maiores.
- * Utiliza a prioridade estática, pois o aging é exigido somente no Round-Robin prioritário.
- */
+/** Prioridade estática preemptiva; valores maiores indicam maior prioridade. */
 public final class PreemptivePriorityScheduler {
     private final Random random;
 
@@ -34,12 +31,10 @@ public final class PreemptivePriorityScheduler {
         int currentTime = 0;
         int terminatedProcesses = 0;
 
-        // A decisão é reavaliada a cada segundo, pois qualquer chegada pode preemptar.
         while (terminatedProcesses < processes.size()) {
             admitArrivedProcesses(processes, readyProcesses, currentTime);
 
-            // Somente prioridade estritamente maior preempta: em empate, o processo que já
-            // ocupa a CPU permanece, evitando troca de contexto.
+            // Prioridade igual preserva o processo em execução.
             if (runningProcess != null
                     && highestPriority(readyProcesses) > runningProcess.staticPriority()) {
                 runningProcess.markReady();

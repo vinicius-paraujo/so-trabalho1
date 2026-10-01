@@ -13,7 +13,7 @@ class ResultFormatterTest {
     private final ResultFormatter formatter = new ResultFormatter();
 
     @Test
-    void deveFormatarUmaSecaoConformeOCt17() {
+    void deveFormatarUmaSecaoConformeOContratoEsperado() {
         AlgorithmReport report = new AlgorithmReport(
                 "FCFS",
                 new SchedulingResult(List.of(1, 1), List.of(new ProcessControlBlock(1, 0, 2, 1))),

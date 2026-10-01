@@ -17,11 +17,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.Timer;
 
-/**
- * Aba de um algoritmo: métricas, diagrama de Gantt animável e resultado por processo. A animação
- * apenas revela, segundo a segundo, uma linha do tempo que já foi calculada.
- */
-@SuppressWarnings("serial") // Componentes Swing deste projeto não são serializados.
+/** Exibe métricas e revela progressivamente uma linha do tempo já calculada. */
+@SuppressWarnings("serial")
 final class AlgorithmPanel extends JPanel {
     private static final int MIN_DELAY_MS = 80;
     private static final int MAX_DELAY_MS = 1500;
@@ -165,7 +162,7 @@ final class AlgorithmPanel extends JPanel {
         controls.add(restartButton);
         controls.add(showAllButton);
         controls.add(new JLabel("   Velocidade:"));
-        // Invertido: à direita, menor intervalo entre segundos, ou seja, animação mais rápida.
+        // O valor do controle representa atraso; por isso, a escala visual é invertida.
         speedSlider.setInverted(true);
         speedSlider.setToolTipText("Intervalo entre segundos simulados");
         controls.add(speedSlider);
@@ -198,7 +195,6 @@ final class AlgorithmPanel extends JPanel {
         return label;
     }
 
-    /** Mesmo formato da saída textual (ADR 0006), para facilitar a comparação entre ambas. */
     static String format(double value) {
         return String.format(Locale.ROOT, "%.2f", value);
     }

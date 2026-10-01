@@ -55,7 +55,7 @@ public final class SchedulingAssertions {
         assertEquals(expectedContextSwitches, contextSwitches(result));
     }
 
-    /** Invariantes do CT-18, válidas para qualquer algoritmo e entrada válida. */
+    /** Invariantes válidas para qualquer algoritmo e entrada válida. */
     public static void assertValidSimulation(List<ProcessControlBlock> input, SchedulingResult result) {
         assertEquals(input.size(), result.processes().size());
 

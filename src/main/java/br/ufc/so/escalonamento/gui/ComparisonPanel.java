@@ -19,8 +19,8 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
-/** Visão lado a lado das métricas dos sete algoritmos. */
-@SuppressWarnings("serial") // Componentes Swing deste projeto não são serializados.
+/** Compara métricas em tabela e gráfico com escala comum. */
+@SuppressWarnings("serial")
 final class ComparisonPanel extends JPanel {
     private final ComparisonTableModel tableModel = new ComparisonTableModel();
     private final MetricsBarChart barChart = new MetricsBarChart();
@@ -75,7 +75,6 @@ final class ComparisonPanel extends JPanel {
         }
     }
 
-    /** Barras horizontais de tt e tw por algoritmo, na mesma escala. */
     private static final class MetricsBarChart extends JPanel {
         private static final Color TURNAROUND_COLOR = new Color(0x1F77B4);
         private static final Color WAITING_COLOR = new Color(0xE37B0E);

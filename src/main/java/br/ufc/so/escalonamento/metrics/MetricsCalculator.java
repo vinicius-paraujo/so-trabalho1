@@ -6,10 +6,7 @@ import br.ufc.so.escalonamento.scheduler.SchedulingResult;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Calcula as métricas exigidas pelo enunciado a partir do resultado de qualquer algoritmo.
- * As médias não são arredondadas; o arredondamento ocorre somente na apresentação.
- */
+/** Calcula métricas sem arredondamento intermediário. */
 public final class MetricsCalculator {
     public SchedulingMetrics calculate(SchedulingResult result) {
         Objects.requireNonNull(result, "O resultado da simulação é obrigatório.");
@@ -50,10 +47,7 @@ public final class MetricsCalculator {
         return (double) totalWaitingTime / processes.size();
     }
 
-    /**
-     * Conta somente a substituição direta de um processo por outro (ADR 0004): a carga inicial
-     * e as transições que envolvem CPU ociosa não são trocas de contexto.
-     */
+    /** Ignora carga inicial e transições de ou para CPU ociosa. */
     public int contextSwitches(List<Integer> timeline) {
         Objects.requireNonNull(timeline, "A linha do tempo é obrigatória.");
 

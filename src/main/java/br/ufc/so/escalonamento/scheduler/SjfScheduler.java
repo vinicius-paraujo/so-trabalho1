@@ -43,7 +43,6 @@ public final class SjfScheduler {
             readyProcesses.remove(runningProcess);
             runningProcess.markRunning();
 
-            // Sem preempção: chegadas durante a execução apenas entram na fila de prontos.
             while (runningProcess.remainingTime() > 0) {
                 timeline.add(runningProcess.id());
                 runningProcess.executeOneSecond();
@@ -58,10 +57,7 @@ public final class SjfScheduler {
         return new SchedulingResult(timeline, processes);
     }
 
-    /**
-     * Como nenhum processo é interrompido, a duração de um processo pronto coincide com seu
-     * tempo restante; o segundo critério de desempate não pode separar candidatos empatados.
-     */
+    /** Em processos nunca iniciados, duração e tempo restante são iguais. */
     private ProcessControlBlock selectShortestJob(List<ProcessControlBlock> readyProcesses) {
         int shortestDuration = Integer.MAX_VALUE;
         for (ProcessControlBlock process : readyProcesses) {

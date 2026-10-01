@@ -16,11 +16,8 @@ import java.awt.RenderingHints;
 import java.util.List;
 import javax.swing.JPanel;
 
-/**
- * Diagrama de Gantt de um algoritmo: uma linha por processo e uma linha da CPU. A quantidade de
- * segundos visíveis permite animar a execução sem recalcular a simulação.
- */
-@SuppressWarnings("serial") // Componentes Swing deste projeto não são serializados.
+/** Renderiza processos e CPU até o instante visível da animação. */
+@SuppressWarnings("serial")
 public final class GanttChartPanel extends JPanel {
     static final int PADDING = 12;
     static final int LABEL_WIDTH = 56;
@@ -67,7 +64,6 @@ public final class GanttChartPanel extends JPanel {
         repaint();
     }
 
-    /** Coordenada horizontal do início do instante informado. */
     public int xOf(int instant) {
         return PADDING + LABEL_WIDTH + instant * CELL_WIDTH;
     }

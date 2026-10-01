@@ -31,12 +31,10 @@ public final class SrtfScheduler {
         int currentTime = 0;
         int terminatedProcesses = 0;
 
-        // A decisão é reavaliada a cada segundo, pois qualquer chegada pode preemptar.
         while (terminatedProcesses < processes.size()) {
             admitArrivedProcesses(processes, readyProcesses, currentTime);
 
-            // Somente tempo restante estritamente menor preempta: em empate, o processo
-            // que já ocupa a CPU permanece, evitando troca de contexto.
+            // Tempo restante igual preserva o processo em execução.
             if (runningProcess != null
                     && shortestRemainingTime(readyProcesses) < runningProcess.remainingTime()) {
                 runningProcess.markReady();

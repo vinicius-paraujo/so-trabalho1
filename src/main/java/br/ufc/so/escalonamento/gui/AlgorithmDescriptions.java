@@ -2,7 +2,6 @@ package br.ufc.so.escalonamento.gui;
 
 import br.ufc.so.escalonamento.simulation.SimulationRunner;
 
-/** Textos de apresentação dos algoritmos; não interferem em sua execução. */
 final class AlgorithmDescriptions {
     private AlgorithmDescriptions() {
     }

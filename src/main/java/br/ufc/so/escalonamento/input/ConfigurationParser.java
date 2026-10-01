@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
-/** Lê o arquivo {@code quantum:N} / {@code aging:N} e aplica as regras do ADR 0005. */
+/** Lê e valida as chaves {@code quantum} e {@code aging}. */
 public final class ConfigurationParser {
     public SchedulerConfiguration parse(Path path) throws IOException {
         Objects.requireNonNull(path, "O caminho da configuração é obrigatório.");

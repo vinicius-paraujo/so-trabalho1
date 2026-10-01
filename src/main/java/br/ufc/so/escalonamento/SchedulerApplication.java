@@ -17,10 +17,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Contrato de terminal (ADR 0005): o único argumento é o caminho da configuração e os
- * processos são lidos de stdin. Fluxos e fontes aleatórias são injetados para os testes.
- */
+/** Coordena validação da entrada, execução dos algoritmos e escrita da saída textual. */
 public final class SchedulerApplication {
     public static final int EXIT_SUCCESS = 0;
     public static final int EXIT_INVALID_INPUT = 1;
@@ -71,7 +68,7 @@ public final class SchedulerApplication {
             return EXIT_INVALID_INPUT;
         }
 
-        // A saída é montada por completo antes da escrita, evitando resultado parcial.
+        // Só escreve após concluir todas as simulações, evitando saída parcial em caso de falha.
         List<AlgorithmReport> reports = simulationRunner.runAll(processes, configuration);
         out.print(resultFormatter.formatAll(reports));
         out.flush();

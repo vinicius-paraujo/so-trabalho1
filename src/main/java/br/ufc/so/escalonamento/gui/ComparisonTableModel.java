@@ -4,8 +4,8 @@ import br.ufc.so.escalonamento.simulation.AlgorithmReport;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
-/** Métricas dos sete algoritmos lado a lado, com identificação do melhor valor por coluna. */
-@SuppressWarnings("serial") // Componentes Swing deste projeto não são serializados.
+/** Modelo das métricas comparativas. */
+@SuppressWarnings("serial")
 public final class ComparisonTableModel extends AbstractTableModel {
     static final int NAME_COLUMN = 0;
     static final int TURNAROUND_COLUMN = 1;
@@ -22,7 +22,7 @@ public final class ComparisonTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
 
-    /** Menor valor da coluna; empates marcam todos os algoritmos empatados. */
+    /** Considera empates numéricos dentro da tolerância. */
     public boolean isBest(int rowIndex, int column) {
         if (column == NAME_COLUMN || reports.isEmpty()) {
             return false;

@@ -10,10 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-/**
- * Prioridade não preemptiva. Valores numéricos maiores representam prioridades maiores.
- * Utiliza a prioridade estática, pois o aging é exigido somente no Round-Robin prioritário.
- */
+/** Prioridade estática não preemptiva; valores maiores indicam maior prioridade. */
 public final class NonPreemptivePriorityScheduler {
     private final Random random;
 
@@ -46,7 +43,6 @@ public final class NonPreemptivePriorityScheduler {
             readyProcesses.remove(runningProcess);
             runningProcess.markRunning();
 
-            // Sem preempção: mesmo um processo mais prioritário aguarda o término do atual.
             while (runningProcess.remainingTime() > 0) {
                 timeline.add(runningProcess.id());
                 runningProcess.executeOneSecond();

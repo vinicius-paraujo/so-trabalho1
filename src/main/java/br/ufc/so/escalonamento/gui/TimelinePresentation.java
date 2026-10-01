@@ -6,11 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Deriva do resultado já calculado as informações que a interface desenha. Nenhuma decisão de
- * escalonamento é tomada aqui: o estado exibido decorre apenas da criação, da conclusão e da
- * linha do tempo produzidas pelo algoritmo.
- */
+/** Deriva segmentos e estados visuais de uma linha do tempo já calculada. */
 public final class TimelinePresentation {
     public enum DisplayState {
         NOT_CREATED,

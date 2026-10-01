@@ -6,15 +6,12 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
-/** Ponto de entrada da aplicação de terminal (ADR 0005); a interface gráfica usa {@code GuiMain}. */
+/** Ponto de entrada da aplicação de terminal. */
 public final class Main {
     private Main() {
     }
 
-    /**
-     * Os fluxos usam UTF-8 explicitamente: no Windows, quando redirecionados, o Java adotaria
-     * a codificação legada do sistema e corromperia os acentos das mensagens de erro.
-     */
+    /** Fixa UTF-8 também para fluxos redirecionados no Windows. */
     public static void main(String[] args) {
         PrintStream out = new PrintStream(new FileOutputStream(FileDescriptor.out), true, StandardCharsets.UTF_8);
         PrintStream err = new PrintStream(new FileOutputStream(FileDescriptor.err), true, StandardCharsets.UTF_8);

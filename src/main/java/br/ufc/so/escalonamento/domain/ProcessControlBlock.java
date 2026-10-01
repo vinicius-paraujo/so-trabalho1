@@ -1,21 +1,8 @@
 package br.ufc.so.escalonamento.domain;
 
 /**
- * Bloco de controle de processo (PCB) da simulação.
- *
- * <p>Os atributos de identidade (identificador, criação, duração e prioridade estática) são
- * imutáveis. O estado de execução (tempo restante, prioridade dinâmica, estado e conclusão) é
- * mutável e só muda pelas transições abaixo, que validam o estado de origem:
- *
- * <pre>
- * NEW --markReady--&gt; READY --markRunning--&gt; RUNNING --terminateAt--&gt; TERMINATED
- *                      ^                        |
- *                      +-------markReady--------+   (preempção ou fim de quantum)
- * </pre>
- *
- * <p>Transições inválidas lançam exceção, o que expõe nos testes erros de implementação dos
- * algoritmos em vez de produzir resultados silenciosamente incorretos. Cada algoritmo trabalha
- * sobre cópias obtidas por {@link #freshCopy()}.
+ * PCB da simulação. Identidade e parâmetros de entrada são imutáveis; métodos de transição
+ * validam o estado de origem e o tempo restante.
  */
 public final class ProcessControlBlock {
     private final int id;

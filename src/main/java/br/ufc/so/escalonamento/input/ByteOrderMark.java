@@ -1,10 +1,6 @@
 package br.ufc.so.escalonamento.input;
 
-/**
- * O Windows PowerShell 5.1 insere um BOM UTF-8 ao encaminhar texto para programas externos,
- * e editores como o Bloco de Notas podem salvá-lo nos arquivos. Sem esta remoção, a primeira
- * linha de uma entrada válida seria rejeitada.
- */
+/** Remove o BOM UTF-8 que pode preceder a primeira linha de arquivos ou fluxos redirecionados. */
 final class ByteOrderMark {
     private static final char BOM = '﻿';
 

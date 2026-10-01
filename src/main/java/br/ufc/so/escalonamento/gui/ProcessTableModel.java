@@ -9,11 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
-/**
- * Processos editados na interface. A conversão passa pelo mesmo {@link ProcessInputParser} da
- * aplicação de terminal, de modo que as regras de validação do ADR 0005 não são duplicadas.
- */
-@SuppressWarnings("serial") // Componentes Swing deste projeto não são serializados.
+/** Modelo editável que reutiliza o {@link ProcessInputParser} na conversão para PCBs. */
+@SuppressWarnings("serial")
 public final class ProcessTableModel extends AbstractTableModel {
     static final int ID_COLUMN = 0;
     static final int ARRIVAL_COLUMN = 1;
@@ -46,7 +43,6 @@ public final class ProcessTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
 
-    /** Novo processo chegando logo após o último, com valores mínimos válidos. */
     public void addProcess() {
         int arrival = rows.isEmpty() ? 0 : rows.getLast()[0];
         rows.add(new int[] {arrival, 1, 1});
@@ -58,7 +54,6 @@ public final class ProcessTableModel extends AbstractTableModel {
             return;
         }
         rows.remove(rowIndex);
-        // Os identificadores seguem a posição da linha e mudam para as linhas seguintes.
         fireTableDataChanged();
     }
 
@@ -67,7 +62,6 @@ public final class ProcessTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
 
-    /** @throws br.ufc.so.escalonamento.input.InputValidationException se algum valor for inválido. */
     public List<ProcessControlBlock> toProcesses() {
         StringBuilder input = new StringBuilder();
         for (int[] row : rows) {

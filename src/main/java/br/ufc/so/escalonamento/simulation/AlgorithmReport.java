@@ -4,7 +4,7 @@ import br.ufc.so.escalonamento.metrics.SchedulingMetrics;
 import br.ufc.so.escalonamento.scheduler.SchedulingResult;
 import java.util.Objects;
 
-/** Resultado completo de um algoritmo, consumido pela saída textual e pela futura interface. */
+/** Agrupa linha do tempo, PCBs finais e métricas de um algoritmo. */
 public record AlgorithmReport(
         String algorithmName,
         SchedulingResult result,

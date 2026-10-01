@@ -13,11 +13,7 @@ import java.util.Random;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
 
-/**
- * Validação integrada (T14): entradas geradas com semente fixa são submetidas aos sete
- * algoritmos, e cada resultado é confrontado com as invariantes do CT-18 e com o cálculo
- * independente das métricas.
- */
+/** Compara os sete algoritmos com invariantes e cálculos independentes em entradas geradas. */
 class SimulationInvariantTest {
     private static final int MAX_PROCESSES = 8;
     private static final int MAX_ARRIVAL = 12;

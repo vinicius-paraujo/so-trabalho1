@@ -43,12 +43,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.WindowConstants;
 
-/**
- * Janela principal. Coleta processos e configuração, delega a simulação ao
- * {@link SimulationRunner} e distribui os resultados entre as abas. Não contém regras de
- * escalonamento, aging ou métricas (ADR 0003).
- */
-@SuppressWarnings("serial") // Componentes Swing deste projeto não são serializados.
+/** Janela principal; delega toda a simulação ao {@link SimulationRunner}. */
+@SuppressWarnings("serial")
 public final class SchedulerWindow extends JFrame {
     private static final int ALGORITHM_COUNT = 7;
 

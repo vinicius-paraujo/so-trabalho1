@@ -4,7 +4,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-/** Ponto de entrada da interface gráfica; a aplicação de terminal permanece em {@code Main}. */
+/** Inicializa a interface Swing na thread de eventos. */
 public final class GuiMain {
     private GuiMain() {
     }
@@ -14,7 +14,7 @@ public final class GuiMain {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (ReflectiveOperationException | UnsupportedLookAndFeelException exception) {
-                // A aparência padrão do Swing continua funcional.
+                // Falha ao aplicar o tema não impede a inicialização.
             }
             new SchedulerWindow().setVisible(true);
         });

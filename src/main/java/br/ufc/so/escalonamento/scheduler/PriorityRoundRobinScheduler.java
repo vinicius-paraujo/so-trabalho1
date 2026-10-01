@@ -68,9 +68,7 @@ public final class PriorityRoundRobinScheduler {
                 }
             }
 
-            // O aging ocorre somente quando o quantum é consumido por completo, inclusive se o
-            // processo termina exatamente no limite. Quem chega no próprio limite ainda não
-            // aguardou e, por isso, é admitido somente depois do envelhecimento.
+            // Chegadas no limite são admitidas após o aging, pois ainda não aguardaram.
             if (usedQuantum == quantum) {
                 ageWaitingProcesses(readyProcesses);
             }
@@ -80,8 +78,7 @@ public final class PriorityRoundRobinScheduler {
                 runningProcess.terminateAt(currentTime);
                 terminatedProcesses++;
             } else {
-                // Ao fim do quantum o processo deixa a CPU e disputa a próxima seleção como os
-                // demais prontos, sem a preferência de quem ainda ocupa a CPU.
+                // Após o quantum, o processo volta a competir com os demais prontos.
                 runningProcess.markReady();
                 readyProcesses.add(runningProcess);
             }

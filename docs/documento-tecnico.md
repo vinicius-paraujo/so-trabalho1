@@ -2,8 +2,6 @@
 
 Trabalho 01 da disciplina CK0234 — Sistemas Operacionais (UFC).
 
-Este documento descreve a implementação do simulador: as classes, as estruturas de dados, a estrutura de controle de cada processo e os padrões de projeto utilizados. Os detalhes de cada decisão estão nos ADRs de `docs/adrs/`, e os casos de teste, em `docs/testing.md`.
-
 ## 1. Visão geral
 
 O simulador lê um conjunto de processos da entrada padrão e um arquivo com `quantum` e `aging`, executa os sete algoritmos sobre a mesma entrada e apresenta, para cada um:
@@ -20,13 +18,13 @@ Há duas formas de uso sobre o mesmo núcleo:
 | Terminal | `br.ufc.so.escalonamento.Main` | `./gradlew -q run --args="config.txt" < processos.txt` |
 | Interface gráfica | `br.ufc.so.escalonamento.gui.GuiMain` | `./gradlew runGui` |
 
-Tecnologia: Java 21, Gradle Wrapper, JUnit 5 e Swing, sem nenhuma dependência de execução externa ao JDK (ADRs 0002 e 0007).
+Tecnologia: Java 21, Gradle Wrapper, JUnit 5 e Swing, sem dependências de execução externas ao JDK.
 
 ## 2. Organização em pacotes
 
 ```text
 br.ufc.so.escalonamento
-├── Main, SchedulerApplication   contrato de terminal (ADR 0005)
+├── Main, SchedulerApplication   aplicação de terminal
 ├── domain      ProcessControlBlock, ProcessState
 ├── input       ProcessInputParser, ConfigurationParser, SchedulerConfiguration,
 │               InputValidationException, ByteOrderMark
@@ -55,7 +53,7 @@ arquivo ► ConfigurationParser ─┴► SimulationRunner ──► 7 escalonad
 
 Dependências entre pacotes:
 
-- `scheduler` não conhece entrada, saída nem interface (regra 1 de `architecture.md`);
+- `scheduler` não conhece entrada, saída nem interface;
 - `simulation` apenas orquestra;
 - `output` e `gui` apenas apresentam resultados.
 
@@ -109,14 +107,14 @@ Motivações:
 
 Justificativas:
 
-- **`ArrayList` como fila de prontos.** Nos algoritmos com critério de seleção, a escolha percorre todos os prontos em três passagens explícitas: melhor critério, menor tempo restante e empatados. Uma fila de prioridade (`PriorityQueue`) esconderia o critério em um comparador e não resolveria o desempate aleatório nem a preferência por quem já ocupa a CPU. Com as entradas do trabalho, o custo linear é irrelevante (regra 7 de `architecture.md`).
+- **`ArrayList` como fila de prontos.** Nos algoritmos com critério de seleção, a escolha percorre todos os prontos em três passagens explícitas: melhor critério, menor tempo restante e empatados. Uma fila de prioridade (`PriorityQueue`) esconderia o critério em um comparador e não resolveria o desempate aleatório nem a preferência por quem já ocupa a CPU. Com as entradas do trabalho, o custo linear é irrelevante.
 - **`ArrayDeque` no Round-Robin.** Na versão sem prioridade, a ordem de chegada à fila é a própria regra de seleção: `pollFirst()` escolhe e `addLast()` recoloca o processo preemptado.
 - **Processo em execução fora da lista nos preemptivos.** Separar `runningProcess` dos prontos torna visíveis a comparação que decide a preempção e o primeiro critério de desempate do enunciado (manter quem já ocupa a CPU).
 - **Linha do tempo como `List<Integer>`.** Cada posição `t` representa o intervalo `[t, t+1)`. O valor é o identificador do processo, ou `SchedulingResult.IDLE` (`0`) quando a CPU está ociosa.
 
 ## 5. Funcionamento dos algoritmos
 
-Todos seguem o mesmo esqueleto, escrito por extenso em cada classe para que a regra de cada um fique visível (ADR 0002):
+Todos seguem o mesmo esqueleto, escrito por extenso em cada classe para que a regra de cada um fique visível:
 
 ```text
 enquanto houver processo não terminado:
@@ -157,7 +155,7 @@ a cada segundo:
 - **SRTF:** tempo restante menor que o do processo em execução.
 - **Prioridade com preempção:** prioridade estática maior que a do processo em execução.
 
-Em caso de empate, o processo em execução permanece (ADR 0004, regra 12).
+Em caso de empate, o processo em execução permanece.
 
 ### 5.3 Round-Robin
 
@@ -169,7 +167,7 @@ se terminou: RUNNING → TERMINATED
 senão: RUNNING → READY; colocar no final da fila
 ```
 
-As chegadas que ocorrem exatamente no fim do quantum entram na fila antes do processo preemptado (ADR 0004 e CT-08). A sequência gerada para o caso de referência coincide com o diagrama de exemplo do enunciado.
+As chegadas que ocorrem exatamente no fim do quantum entram na fila antes do processo preemptado. A sequência gerada para o caso de referência coincide com o diagrama de exemplo do enunciado.
 
 ### 5.4 Round-Robin com prioridade e aging
 
@@ -184,11 +182,7 @@ se terminou: RUNNING → TERMINATED
 senão: RUNNING → READY (disputa a próxima seleção sem preferência)
 ```
 
-Origem das regras:
-
-- **Enunciado:** o aging ocorre a cada quantum, e não há preempção por prioridade.
-- **Notas de aula:** o processo selecionado volta à prioridade estática, e os que aguardam são incrementados (diagrama PRIOd).
-- **ADR 0004, regras 13 a 15:** os pontos que o enunciado deixa em aberto — preferência de quem esgotou o quantum, término exatamente no limite e chegada exatamente no limite. Cada regra foi validada contra o caso de referência e os CTs 05, 10, 11 e 12.
+Regras complementares: o processo que esgota o quantum retorna à fila e disputa a próxima seleção sem preferência; o aging é aplicado quando um quantum inteiro é consumido, inclusive se o processo termina no limite; processos que chegam exatamente nesse limite são admitidos depois do aging, pois ainda não aguardaram.
 
 ## 6. Desempates e aleatoriedade
 
@@ -201,7 +195,7 @@ Ordem de desempate aplicada por todos os algoritmos com critério de seleção:
 A fonte aleatória é injetada no construtor de cada escalonador:
 
 - na execução normal, `new Random()`;
-- nos testes, `new Random(0)`, o que torna os resultados reproduzíveis (ADR 0004);
+- nos testes, `new Random(0)`, o que torna os resultados reproduzíveis;
 - na interface gráfica, semente fixa opcional para repetir demonstrações.
 
 No Round-Robin sem prioridade, a ordem FIFO define a escolha, e o sorteio nunca é usado.
@@ -217,15 +211,15 @@ No Round-Robin sem prioridade, a ordem FIFO define a escolha, e o sorteio nunca 
 | `tt` e `tw` | médias aritméticas, sem arredondamento interno |
 | Trocas de contexto | pares de segundos consecutivos executados por processos diferentes |
 
-Não contam como troca a carga inicial, a entrada ou a saída de `OCIOSO` e a continuidade do mesmo processo depois de uma decisão (ADR 0004). As médias são apresentadas com duas casas decimais somente na saída.
+Não contam como troca a carga inicial, a entrada ou a saída de `OCIOSO` e a continuidade do mesmo processo depois de uma decisão. As médias são apresentadas com duas casas decimais somente na saída.
 
 ## 8. Entrada, saída e erros
 
-- **Entrada (ADR 0005):**
+- **Entrada:**
   - o único argumento é o caminho da configuração;
   - os processos vêm de `stdin`, três inteiros por linha, separados por espaços ou tabulações;
   - a entrada é lida em UTF-8, e um BOM inicial é aceito.
-- **Saída (ADR 0006):**
+- **Saída:**
   - sete seções, na ordem do enunciado, separadas por uma linha vazia;
   - `##` indica o processo em execução, e `--` indica quem não executa naquele segundo.
 - **Erros:**
@@ -237,7 +231,7 @@ A saída só é escrita depois de montada por completo, e nunca há resultado pa
 
 ## 9. Interface gráfica
 
-A interface (`gui`, ADR 0007) usa exatamente a mesma lista de `AlgorithmReport` da saída textual. Ela não contém regras de seleção, preempção, aging ou métricas.
+A interface (`gui`) usa exatamente a mesma lista de `AlgorithmReport` da saída textual. Ela não contém regras de seleção, preempção, aging ou métricas.
 
 - **Entrada:**
   - tabela editável, validada pelo mesmo `ProcessInputParser`;
@@ -253,7 +247,7 @@ A interface (`gui`, ADR 0007) usa exatamente a mesma lista de `AlgorithmReport` 
 
 ## 10. Padrões de projeto
 
-Os padrões foram adotados somente onde resolvem um problema concreto (ADR 0002, item 7, e regra 6 de `architecture.md`).
+Os padrões foram adotados somente onde resolvem um problema concreto.
 
 | Padrão ou técnica | Onde | Motivo |
 | --- | --- | --- |
@@ -265,7 +259,7 @@ Os padrões foram adotados somente onde resolvem um problema concreto (ADR 0002,
 
 Padrões deliberadamente **não** usados:
 
-- **Strategy / interface comum de escalonadores.** Uma abstração `Scheduler` com um laço genérico e políticas plugáveis reduziria linhas, mas esconderia as diferenças teóricas: seleção uma vez versus a cada segundo, preempção versus quantum, fila FIFO versus seleção por critério. O ADR 0002 veda essa generalização. O `SimulationRunner` chama os sete algoritmos explicitamente.
+- **Strategy / interface comum de escalonadores.** Uma abstração `Scheduler` com um laço genérico e políticas plugáveis reduziria linhas, mas esconderia as diferenças teóricas: seleção uma vez versus a cada segundo, preempção versus quantum, fila FIFO versus seleção por critério. O `SimulationRunner` chama os sete algoritmos explicitamente.
 - **Template Method.** Pelo mesmo motivo. O que é realmente comum (cópia, admissão e sorteio) está em `SchedulingSupport`, como funções simples.
 
 ## 11. Testes
@@ -281,22 +275,9 @@ A suíte JUnit 5 (`./gradlew clean test`) tem mais de 800 testes:
   - o determinismo.
 - **Interface:** renderização do diagrama em memória (modo headless), com verificação da cor das células.
 
-Os resultados esperados foram definidos antes das implementações (`docs/testing.md`). O relatório da validação integrada está em `docs/testing.md` §9.
+Os resultados esperados foram definidos antes das implementações.
 
-## 12. Decisões registradas
-
-| ADR | Assunto |
-| --- | --- |
-| [0001](adrs/0001-governanca-e-fontes-do-projeto.md) | Governança e precedência das fontes |
-| [0002](adrs/0002-linguagem-ferramentas-e-visibilidade-dos-algoritmos.md) | Java 21, Gradle, JUnit 5 e visibilidade dos algoritmos |
-| [0003](adrs/0003-interface-grafica.md) | Adoção da interface gráfica |
-| [0004](adrs/0004-convencoes-de-simulacao-e-testes.md) | Convenções de simulação, desempates e aging |
-| [0005](adrs/0005-contrato-de-entrada.md) | Contrato de entrada, validação e erros |
-| [0006](adrs/0006-formato-da-saida-textual.md) | Formato da saída textual |
-| [0007](adrs/0007-tecnologia-da-interface-grafica.md) | Swing como tecnologia da interface |
-| [0008](adrs/0008-conteudo-da-entrega.md) | Conteúdo da entrega |
-
-## 13. Limitações conhecidas
+## 12. Limitações conhecidas
 
 - O tempo é discreto, em segundos inteiros, como na entrada do enunciado.
 - O custo da troca de contexto não é simulado; as trocas são apenas contadas.

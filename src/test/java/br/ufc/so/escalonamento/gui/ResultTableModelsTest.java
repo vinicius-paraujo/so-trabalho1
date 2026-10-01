@@ -47,7 +47,7 @@ class ResultTableModelsTest {
         ProcessResultTableModel model = new ProcessResultTableModel();
         model.setProcesses(reports.get(6).result().processes());
 
-        // Round-Robin prioritário: conclusões 12, 2, 14, 7 (testing.md, tabela 5.1).
+        // Round-Robin prioritário: conclusões 12, 2, 14, 7.
         assertEquals(4, model.getRowCount());
         assertEquals("P3", model.getValueAt(2, 0));
         assertEquals(14, model.getValueAt(2, 4));
