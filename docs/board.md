@@ -22,7 +22,6 @@ Um cartão só entra em **A fazer** quando todas as suas dependências estão em
 
 | ID | Título | Dependências | Responsável | Critério de pronto |
 |---|---|---|---|---|
-| T-07 | Processo Analista | T-01 | — | Nasce dormindo; a cada `SIGCONT` imprime e remove no máximo 10 PIDs. |
 
 ## Em andamento
 
@@ -33,7 +32,7 @@ Um cartão só entra em **A fazer** quando todas as suas dependências estão em
 
 | ID | Título | Dependências | Responsável | Critério de pronto |
 |---|---|---|---|---|
-| T-05 | Fila de atendimento | T-04 | Marcos | Inserção/remoção corretas sob preempção; testes passando. |
+| T-07 | Processo Analista | T-01 | Marcos | Nasce dormindo; a cada `SIGCONT` imprime e remove no máximo 10 PIDs. |
 
 ## Concluído
 
@@ -45,3 +44,4 @@ Um cartão só entra em **A fazer** quando todas as suas dependências estão em
 | T-02 | Núcleo de *threads* (TCB, pilhas, `CriaThread`, troca de contexto cooperativa) | T-01 | Marcos | Duas *threads* alternam via `CedeProcessador`, com contexto salvo/restaurado em *assembly*. |
 | T-03 | Preempção por `setitimer` + `SIGALRM` | T-02 | Marcos | Duas *threads* em laço infinito alternam sem `CedeProcessador` explícito. |
 | T-04 | Exclusão mútua (`EntraRegiaoCritica`/`SaiRegiaoCritica`) | T-02 | Marcos | Contador incrementado por duas *threads* preemptadas não perde atualizações. |
+| T-05 | Fila de atendimento | T-04 | Marcos | Inserção/remoção corretas sob preempção; testes passando. |

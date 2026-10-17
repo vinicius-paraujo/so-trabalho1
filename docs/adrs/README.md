@@ -13,3 +13,4 @@ substitui (status "Substituída por ADR-XXXX").
 | [0004](ADR-0004-preempcao-por-sigalrm.md) | Preempção por `SIGALRM` e desabilitação de interrupções | Aceita |
 | [0005](ADR-0005-nomenclatura-em-portugues.md) | Nomenclatura em português | Aceita |
 | [0006](ADR-0006-exclusao-mutua-por-tsl.md) | Exclusão mútua por TSL com cessão do processador | Aceita |
+| [0007](ADR-0007-despertar-do-analista.md) | Despertar do Analista sem perda de sinal | Aceita |

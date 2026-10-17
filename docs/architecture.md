@@ -92,9 +92,12 @@ acorda o Analista (estratégia de despertar a definir).
 
 ### 3.5 Processo 2 — Analista
 
-Modelo de `printer.c`: grava seu PID em arquivo e executa `raise(SIGSTOP)`. Ao receber
-`SIGCONT`: `sem_wait(/sem_block)` → lê e imprime até 10 PIDs do LNG → reescreve o LNG sem eles
-→ `sem_post(/sem_block)` → `raise(SIGSTOP)`.
+Implementado em `analista.c`, no modelo do `printer.c`: grava seu PID em `pid_analista.txt` e, em
+laço, dorme (`raise(SIGSTOP)`); ao receber `SIGCONT`, entra na região crítica de `/sem_block`,
+imprime até `MAX_IMPRESSOS` (10) PIDs do início de `lng.txt`, remove-os (cópia para `lng.tmp` +
+`rename`) e libera o semáforo. O Atendimento só o acorda depois de confirmar, por `waitpid` com
+`WUNTRACED`, que ele está parado (ADR-0007). Nomes de arquivos e semáforos compartilhados ficam em
+`comum.h`.
 
 ### 3.6 Processo 3 — Cliente
 

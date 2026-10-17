@@ -7,7 +7,7 @@ LDLIBS  = -pthread
 PROGRAMAS = atendimento analista cliente
 # Fontes compartilhados pelo Atendimento e pelos testes
 FONTES    = src/nucleo.c src/fila.c
-CABECALHOS = src/nucleo.h src/fila.h
+CABECALHOS = src/nucleo.h src/fila.h src/comum.h
 TESTES    = $(patsubst tests/%.c,build/tests/%,$(wildcard tests/teste_*.c))
 
 .PHONY: all test clean
@@ -19,16 +19,17 @@ all: $(PROGRAMAS)
 atendimento: src/atendimento.c $(FONTES) $(CABECALHOS)
 	$(CC) $(CFLAGS) src/atendimento.c $(FONTES) -o $@ $(LDLIBS)
 
-%: src/%.c
+%: src/%.c src/comum.h
 	$(CC) $(CFLAGS) $< -o $@ $(LDLIBS)
 
 build/tests/%: tests/%.c tests/teste.h $(FONTES) $(CABECALHOS)
 	@mkdir -p build/tests
 	$(CC) $(CFLAGS) -Isrc $< $(FONTES) -o $@ $(LDLIBS)
 
-test: $(TESTES)
+# Os testes de integração executam os programas compilados
+test: $(PROGRAMAS) $(TESTES)
 	@echo "Executando testes:"
 	@for t in $(TESTES); do ./$$t || exit 1; done
 
 clean:
-	rm -rf build $(PROGRAMAS) demanda.txt
+	rm -rf build $(PROGRAMAS) demanda.txt lng.txt lng.tmp pid_analista.txt
