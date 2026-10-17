@@ -1,4 +1,4 @@
-# Trabalho 1 — Sistemas Operacionais (CK0234, UFC)
+# Trabalho 1 — Sistemas Operacionais (Yuri)
 
 Simulação de um sistema de atendimento com threads implementadas por troca de contexto e escalonador próprios.
 

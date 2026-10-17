@@ -11,8 +11,8 @@
 
 typedef enum
 {
-	LIVRE,       // posição da tabela sem thread
-	PRONTA,      // aguardando o processador
+	LIVRE,
+	PRONTA,
 	EXECUTANDO,
 	TERMINADA
 
@@ -40,5 +40,11 @@ void ConfiguraTemporizador(int QuantumUs);
 void DesligaTemporizador();
 void DesabilitaInterrupcoes();
 void HabilitaInterrupcoes();
+
+// 0 = livre, 1 = ocupada
+typedef volatile int TRAVA;
+
+void EntraRegiaoCritica(TRAVA *Trava);
+void SaiRegiaoCritica(TRAVA *Trava);
 
 #endif

@@ -61,7 +61,7 @@ Espelha `protokernel/aulafinal/kernel.c`, transposto do UEFI para o Linux:
 | Interrupção de *timer* | APIC x2, vetor 32, periódico | `ConfiguraTemporizador`: `setitimer(ITIMER_REAL)` + `SIGALRM` (ADR-0004) |
 | Salvamento de contexto | `timer_stub` (*naked*) | `TrocaContexto` (*naked*), chamada por `CedeProcessador` e `TratadorTemporizador` |
 | Escalonador | `Scheduler(CurrentRsp)` devolve novo `rsp` | `Escalonador(RspAtual)`, mesma semântica |
-| Exclusão mútua interna | `Acquire/Release` (`InterlockedCompareExchange32`) | `EntraRegiaoCritica/SaiRegiaoCritica` com instrução atômica (modelo `me4-tsl.c`) |
+| Exclusão mútua interna | `Acquire/Release` (`InterlockedCompareExchange32`) | `EntraRegiaoCritica/SaiRegiaoCritica`: TSL (`me4-tsl.c`) cedendo o processador na disputa (ADR-0006) |
 
 ### 3.2 Thread 2 — Recepção
 

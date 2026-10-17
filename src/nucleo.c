@@ -237,6 +237,22 @@ int CriaThread(void (*Entrada)(void *), void *Argumento)
 	return Id;
 }
 
+// TSL: testa e ocupa a trava numa única instrução atômica. Como a preempção só ocorre entre
+// instruções, nenhuma outra thread consegue ver a trava livre entre o teste e a ocupação.
+void EntraRegiaoCritica(TRAVA *Trava)
+{
+	// Se ocupada, quem a detém só a libera quando voltar a executar:
+	// ceder o processador evita gastar o resto do quantum em espera ocupada
+	while(__sync_fetch_and_or(Trava, 1))
+		CedeProcessador();
+}
+
+void SaiRegiaoCritica(TRAVA *Trava)
+{
+	// Além de zerar a trava, impede o compilador de mover escritas da região crítica para depois dela
+	__sync_lock_release(Trava);
+}
+
 int ThreadsAtivas()
 {
 	int Ativas = 0;

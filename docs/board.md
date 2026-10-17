@@ -23,7 +23,6 @@ Um cartão só entra em **A fazer** quando todas as suas dependências estão em
 
 | ID | Título | Dependências | Responsável | Critério de pronto |
 |---|---|---|---|---|
-| T-04 | Exclusão mútua (`EntraRegiaoCritica`/`SaiRegiaoCritica`) | T-02 | — | Contador incrementado por duas *threads* preemptadas não perde atualizações. |
 | T-07 | Processo Analista | T-01 | — | Nasce dormindo; a cada `SIGCONT` imprime e remove no máximo 10 PIDs. |
 
 ## Em andamento
@@ -35,7 +34,7 @@ Um cartão só entra em **A fazer** quando todas as suas dependências estão em
 
 | ID | Título | Dependências | Responsável | Critério de pronto |
 |---|---|---|---|---|
-| T-03 | Preempção por `setitimer` + `SIGALRM` | T-02 | Marcos | Duas *threads* em laço infinito alternam sem `CedeProcessador` explícito. |
+| T-04 | Exclusão mútua (`EntraRegiaoCritica`/`SaiRegiaoCritica`) | T-02 | Marcos | Contador incrementado por duas *threads* preemptadas não perde atualizações. |
 
 ## Concluído
 
@@ -45,3 +44,4 @@ Um cartão só entra em **A fazer** quando todas as suas dependências estão em
 | T-00b | Estratégia de testes (ADR-0002) | T-00 | Marcos | ADR-0002 aceita. |
 | T-01 | Estrutura do repositório e `Makefile` | — | Marcos | `make` compila `atendimento`, `analista` e `cliente`; `make test` executa `tests/` com a macro de `tests/teste.h` (ADR-0002); `make clean` limpa. |
 | T-02 | Núcleo de *threads* (TCB, pilhas, `CriaThread`, troca de contexto cooperativa) | T-01 | Marcos | Duas *threads* alternam via `CedeProcessador`, com contexto salvo/restaurado em *assembly*. |
+| T-03 | Preempção por `setitimer` + `SIGALRM` | T-02 | Marcos | Duas *threads* em laço infinito alternam sem `CedeProcessador` explícito. |
