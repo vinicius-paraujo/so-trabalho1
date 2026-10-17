@@ -11,7 +11,6 @@
 #define SEM_ATEND "/sem_atend"                    // fixado pelo cliente fornecido
 #define SEM_BLOCK "/sem_block"                    // protege o arquivo LNG
 
-// Quantidade máxima de PIDs que o Analista imprime a cada vez que acorda
 #define MAX_IMPRESSOS 10
 
 #endif
