@@ -73,9 +73,15 @@ Espelha `protokernel/aulafinal/kernel.c`, transposto do UEFI para o Linux:
 
 ### 3.3 Fila de clientes
 
-Estrutura própria, compartilhada entre as *threads* e acessada somente dentro de
-`EntraRegiaoCritica()`/`SaiRegiaoCritica()`. A **ordem de retirada** é a principal alavanca de desempenho e será
-decidida em ADR própria, por medição.
+Implementada em `fila.c`/`fila.h`. Vetor de `CAPACIDADE_FILA` (100) posições de `CLIENTE`
+(`Pid`, `HoraChegada`, `Prioridade`, `Demanda` — os campos do diagrama), com uma `TRAVA` própria:
+toda operação (`InsereFila`, `RetiraFila`, `TamanhoFila`) é uma região crítica. As operações não
+bloqueiam: devolvem 0 quando a fila está cheia ou vazia, e quem chamou decide se cede o
+processador e tenta de novo.
+
+A retirada atual é por ordem de chegada (posição 0, deslocando as demais). A **ordem de retirada**
+é a principal alavanca de desempenho e será decidida em ADR própria, por medição; o vetor simples
+permite retirar de qualquer posição sem mudar a estrutura.
 
 ### 3.4 Thread 1 — Atendente
 

@@ -5,7 +5,9 @@ CFLAGS  = -Wall -Wextra -std=gnu11 -g
 LDLIBS  = -pthread
 
 PROGRAMAS = atendimento analista cliente
-NUCLEO    = src/nucleo.c src/nucleo.h
+# Fontes compartilhados pelo Atendimento e pelos testes
+FONTES    = src/nucleo.c src/fila.c
+CABECALHOS = src/nucleo.h src/fila.h
 TESTES    = $(patsubst tests/%.c,build/tests/%,$(wildcard tests/teste_*.c))
 
 .PHONY: all test clean
@@ -14,15 +16,15 @@ all: $(PROGRAMAS)
 
 # Os executáveis ficam na raiz porque o Atendimento cria os clientes com ./cliente
 # e todos compartilham o demanda.txt do diretório corrente.
-atendimento: src/atendimento.c $(NUCLEO)
-	$(CC) $(CFLAGS) src/atendimento.c src/nucleo.c -o $@ $(LDLIBS)
+atendimento: src/atendimento.c $(FONTES) $(CABECALHOS)
+	$(CC) $(CFLAGS) src/atendimento.c $(FONTES) -o $@ $(LDLIBS)
 
 %: src/%.c
 	$(CC) $(CFLAGS) $< -o $@ $(LDLIBS)
 
-build/tests/%: tests/%.c tests/teste.h $(NUCLEO)
+build/tests/%: tests/%.c tests/teste.h $(FONTES) $(CABECALHOS)
 	@mkdir -p build/tests
-	$(CC) $(CFLAGS) -Isrc $< src/nucleo.c -o $@ $(LDLIBS)
+	$(CC) $(CFLAGS) -Isrc $< $(FONTES) -o $@ $(LDLIBS)
 
 test: $(TESTES)
 	@echo "Executando testes:"
