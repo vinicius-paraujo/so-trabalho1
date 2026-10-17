@@ -96,10 +96,19 @@ permite retirar de qualquer posição sem mudar a estrutura.
 
 ### 3.4 Thread 1 — Atendente
 
-Segue literalmente a sequência do diagrama:
-lê o próximo cliente → acorda o cliente → espera `/sem_atend` → espera `/sem_block` →
-escreve o PID no LNG → libera `/sem_block` → calcula a satisfação → retira o cliente da fila →
-acorda o Analista (estratégia de despertar a definir).
+Implementada em `atendente.c`/`atendente.h` (ADR-0008). Para cada cliente:
+
+1. Retira o próximo cliente da fila (se vazia, cede o processador).
+2. Acorda o cliente (`SIGCONT`) e espera seu término com `waitpid(..., WNOHANG)`, cedendo o
+   processador entre consultas; o término implica que o cliente já liberou `/sem_atend`.
+3. Registra a hora de término e grava o PID no LNG dentro de `/sem_block` (`sem_trywait`).
+4. Satisfeito se `(término − chegada) ≤ paciência` (`X/2` para alta, `X` para baixa).
+5. Acorda o Analista quando há ≥ 10 PIDs pendentes e ele está parado (ADR-0007).
+
+O `main` de `atendimento.c` monta tudo: relógio, núcleo, fila, temporizador (quantum de 1 ms),
+Recepção; cria o Analista depois que os semáforos existem; cria o Atendente; espera as *threads*;
+chama `EsvaziaLng`; encerra o Analista, remove semáforos e arquivos e imprime a taxa de
+satisfação e o tempo total.
 
 ### 3.5 Processo 2 — Analista
 
