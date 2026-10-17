@@ -1,0 +1,6 @@
+build/
+atendimento
+analista
+cliente
+demanda.txt
+*.o
