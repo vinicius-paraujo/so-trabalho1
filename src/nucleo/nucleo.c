@@ -11,7 +11,10 @@ volatile int ThreadAtual = THREAD_PRINCIPAL;
 static uint8_t Pilhas[MAX_THREADS][TAMANHO_PILHA] __attribute__((aligned(16)));
 
 // Equivalentes a cli/sti: o SIGALRM faz o papel da interrupção do temporizador,
-// então bloqueá-lo impede que o escalonador interrompa o trecho atual
+// então bloqueá-lo impede que o escalonador interrompa o trecho atual.
+// Toda chamada à biblioteca C que use malloc ou stdio (fopen, printf, fork, sem_open, rand...)
+// deve ficar entre estas funções: com uma única thread do sistema operacional, a glibc dispensa
+// suas travas internas, e duas das nossas threads intercaladas ali corrompem a memória dela.
 void DesabilitaInterrupcoes()
 {
 	sigset_t Temporizador;

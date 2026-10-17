@@ -128,29 +128,44 @@ Fornecido e **inalterado** (nota 5: todas as equipes usam o mesmo). Contrato:
 
 ## 4. Encerramento e métricas
 
-- **Taxa de satisfação** = satisfeitos / atendidos; **tempo total** medido com relógio monotônico.
-- `N = 0`: leitura de `s` com terminal em modo não canônico e leitura não bloqueante. Antes
-  de sair, o Analista é acordado até o LNG ficar vazio.
-- Limpeza: `sem_unlink`, remoção de arquivos temporários, término do Analista e coleta dos
-  filhos (evitar zumbis).
+- **Taxa de satisfação** = satisfeitos / atendidos; **tempo total** medido pelo relógio do programa.
+- `N = 0`: `teclado.c` coloca o terminal em modo não canônico, sem eco (`termios`, `VMIN = VTIME = 0`),
+  de modo que `read` devolve a tecla na hora ou nada; se a entrada não for um terminal (pipe), usa
+  `O_NONBLOCK`. O `main` atua como *thread* de controle: a cada volta, lê uma tecla; com `s`/`S`,
+  sinaliza `Encerrar` para a Recepção e o Atendente (o atendimento em curso é concluído). Em
+  seguida, encerra e recolhe os clientes que ficaram na fila (não entram na taxa), acorda o
+  Analista até esvaziar o LNG e restaura o terminal. `Ctrl+C` também restaura o terminal.
+- Limpeza: término do Analista (parado), `sem_unlink`, remoção do LNG e do arquivo de PID.
+- Chamadas à biblioteca C ficam entre `DesabilitaInterrupcoes`/`HabilitaInterrupcoes` (ADR-0009).
 
-## 5. Estrutura de diretórios prevista
+## 5. Estrutura de diretórios
 
 ```
 Trabalho-Yuri-1/
-├── docs/            board.md, architecture.md, adrs/
+├── docs/                    board.md, architecture.md, adrs/ (não entregue)
 ├── src/
-│   ├── atendimento.c      main, entradas, métricas
-│   ├── nucleo.c / .h      TCB, CriaThread, Escalonador, TrocaContexto, região crítica
-│   ├── fila.c / .h        fila de clientes
-│   ├── recepcao.c         Thread 2
-│   ├── atendente.c        Thread 1
-│   ├── analista.c         Processo 2
-│   └── cliente.c          Processo 3 (fornecido, inalterado)
-├── tests/           teste.h (macro própria) e testes unitários, de núcleo e de integração (ADR-0002)
-├── Makefile         alvos: (padrão), test, clean
+│   ├── nucleo/              o "sistema operacional" em miniatura
+│   │   └── nucleo.c / .h      TCB, CriaThread, Escalonador, TrocaContexto, preempção, região crítica
+│   ├── atendimento/         Processo 1 — tudo o que roda dentro do Atendimento
+│   │   ├── atendimento.c      main: monta as peças, thread de controle (tecla s), métricas, limpeza
+│   │   ├── recepcao.c / .h    Thread 2
+│   │   ├── atendente.c / .h   Thread 1
+│   │   ├── fila.c / .h        fila de clientes
+│   │   ├── relogio.c / .h     tempo desde o início do programa
+│   │   └── teclado.c / .h     leitura de tecla sem esperar
+│   ├── processos/           os outros processos do diagrama
+│   │   ├── analista.c         Processo 2
+│   │   └── cliente.c          Processo 3 (fornecido)
+│   └── comum/
+│       └── comum.h            nomes de arquivos e semáforos compartilhados entre processos
+├── tests/                   teste.h e testes unitários, de núcleo e de integração (ADR-0002)
+├── Makefile                 alvos: (padrão), test, clean; -I para cada subdiretório
 └── README.md
 ```
+
+A divisão segue as fronteiras do diagrama: o núcleo é independente do problema; `atendimento/`
+é o Processo 1; `processos/` reúne os processos 2 e 3; `comum/` é o contrato entre eles. Os
+`#include` usam apenas o nome do arquivo, resolvido pelas opções `-I` do `Makefile`.
 
 ## 6. Riscos técnicos conhecidos
 

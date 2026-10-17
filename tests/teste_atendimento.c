@@ -105,6 +105,49 @@ static void TestaExecucao(const char *Comando, int N)
 	VERIFICA(access(ARQUIVO_DEMANDA, F_OK) != 0);
 }
 
+// Conta processos "cliente" ainda existentes, inclusive parados
+static int ClientesRemanescentes()
+{
+	int Encontrados = 0;
+	DIR *Diretorio = opendir("/proc");
+	struct dirent *Entrada;
+
+	while(Diretorio != NULL && (Entrada = readdir(Diretorio)) != NULL)
+	{
+		char Caminho[300], Nome[64] = "";
+		snprintf(Caminho, sizeof(Caminho), "/proc/%s/comm", Entrada->d_name);
+
+		FILE *Arquivo = fopen(Caminho, "r");
+		if(Arquivo == NULL) continue;
+		fscanf(Arquivo, "%63s", Nome);
+		fclose(Arquivo);
+
+		if(strcmp(Nome, "cliente") == 0) Encontrados++;
+	}
+
+	if(Diretorio != NULL) closedir(Diretorio);
+	return Encontrados;
+}
+
+// N = 0: a tecla "s" chega pela entrada padrão depois de um tempo de execução
+static void TestaModoInfinito(const char *Comando)
+{
+	EXECUCAO Execucao = Executa(Comando);
+
+	VERIFICA(Execucao.Codigo == 0);
+	VERIFICA(Execucao.ResumoLido == 2);
+	VERIFICA(Execucao.Atendidos > 0);
+
+	// O LNG foi esvaziado antes da saída: todo cliente atendido teve o PID impresso
+	VERIFICA(Execucao.QuantidadePids == Execucao.Atendidos);
+	VERIFICA(PidsDistintos(&Execucao));
+
+	// Clientes que ficaram na fila foram encerrados, sem sobrar processos parados
+	VERIFICA(ClientesRemanescentes() == 0);
+	VERIFICA(SemaforosRemanescentes() == 0);
+	VERIFICA(access(ARQUIVO_LNG, F_OK) != 0);
+}
+
 int main()
 {
 	TestaSatisfacao();
@@ -114,6 +157,11 @@ int main()
 
 	// Mais clientes que a capacidade da fila e paciência curta
 	TestaExecucao("./atendimento 250 50", 250);
+
+	TestaModoInfinito("(sleep 1; printf s) | ./atendimento 0 100");
+
+	// Teclas diferentes de "s" são ignoradas
+	TestaModoInfinito("(sleep 0.5; printf xq; sleep 0.5; printf s) | ./atendimento 0 20");
 
 	return RESUMO_TESTES();
 }

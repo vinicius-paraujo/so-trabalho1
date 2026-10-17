@@ -15,3 +15,4 @@ substitui (status "Substituída por ADR-XXXX").
 | [0006](ADR-0006-exclusao-mutua-por-tsl.md) | Exclusão mútua por TSL com cessão do processador | Aceita |
 | [0007](ADR-0007-despertar-do-analista.md) | Despertar do Analista sem perda de sinal | Aceita |
 | [0008](ADR-0008-fim-do-atendimento-por-waitpid.md) | Fim do atendimento detectado por `waitpid` | Aceita |
+| [0009](ADR-0009-biblioteca-c-sem-preempcao.md) | Chamadas à biblioteca C com interrupções desabilitadas | Aceita |
