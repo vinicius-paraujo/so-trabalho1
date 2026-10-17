@@ -136,6 +136,13 @@ Fornecido e **inalterado** (nota 5: todas as equipes usam o mesmo). Contrato:
   seguida, encerra e recolhe os clientes que ficaram na fila (não entram na taxa), acorda o
   Analista até esvaziar o LNG e restaura o terminal. `Ctrl+C` também restaura o terminal.
 - Limpeza: término do Analista (parado), `sem_unlink`, remoção do LNG e do arquivo de PID.
+- **Ctrl+C** (`TratadorInterrupcao` em `atendimento.c`): encerra com `SIGKILL` os clientes da fila, o
+  cliente em criação (`PidEmCriacao`), o cliente em atendimento (`PidEmAtendimento`) e o Analista;
+  espera o cliente em criação e o Analista morrerem antes de remover arquivos (senão poderiam
+  recriá-los); remove semáforos e arquivos; restaura o terminal; sai com código 130.
+- **Analista morto**: `waitpid` passa a distinguir parada de término. Se o Analista terminar, o
+  Atendente deixa de esperá-lo (inclusive em `/sem_block`, que ele pode ter deixado ocupado) e o
+  programa conclui normalmente, com aviso em `stderr`.
 - Chamadas à biblioteca C ficam entre `DesabilitaInterrupcoes`/`HabilitaInterrupcoes` (ADR-0009).
 
 ## 5. Estrutura de diretórios

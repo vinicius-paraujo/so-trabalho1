@@ -9,6 +9,7 @@
 #include <sys/wait.h>
 
 static int AnalistaDormindo = 0;
+static int AnalistaVivo = 1;
 static int PidsPendentes = 0;
 
 static sem_t *SemBlock;
@@ -25,8 +26,18 @@ static void AtualizaEstadoAnalista(pid_t PidAnalista)
 {
 	int Status;
 
-	if(waitpid(PidAnalista, &Status, WUNTRACED | WNOHANG) > 0 && WIFSTOPPED(Status))
-		AnalistaDormindo = 1;
+	if(waitpid(PidAnalista, &Status, WUNTRACED | WNOHANG) > 0)
+	{
+		if(WIFSTOPPED(Status))
+			AnalistaDormindo = 1;
+		else
+			AnalistaVivo = 0;    // terminou: nunca mais vai adormecer, então não se deve esperá-lo
+	}
+}
+
+int AnalistaAtivo()
+{
+	return AnalistaVivo;
 }
 
 static void AcordaAnalista(pid_t PidAnalista)
@@ -54,6 +65,7 @@ void EsvaziaLng(ATENDENTE *Dados)
 	{
 		AtualizaEstadoAnalista(Dados->PidAnalista);
 
+		if(!AnalistaVivo) break;
 		if(AnalistaDormindo && PidsPendentes == 0) break;
 
 		if(AnalistaDormindo)
@@ -71,11 +83,22 @@ static void EsperaClienteTerminar(pid_t Pid)
 		CedeProcessador();
 }
 
-static void EscreveLng(pid_t Pid)
+static void EscreveLng(pid_t Pid, pid_t PidAnalista)
 {
 	// sem_wait bloquearia o processo inteiro enquanto o Analista usa o LNG
+	int Obteve = 1;
 	while(sem_trywait(SemBlock) != 0)
+	{
+		// Se o Analista morreu dentro da região crítica, o semáforo nunca mais será liberado;
+		// sem ele, o Atendente é o único a usar o LNG e não há mais com quem disputá-lo
+		AtualizaEstadoAnalista(PidAnalista);
+		if(!AnalistaVivo)
+		{
+			Obteve = 0;
+			break;
+		}
 		CedeProcessador();
+	}
 
 	//*** Início da região crítica: o Analista também lê e reescreve o LNG ***
 	DesabilitaInterrupcoes();
@@ -85,7 +108,8 @@ static void EscreveLng(pid_t Pid)
 	HabilitaInterrupcoes();
 	//*** Fim da região crítica ***
 
-	sem_post(SemBlock);
+	if(Obteve)
+		sem_post(SemBlock);
 
 	PidsPendentes++;
 }
@@ -119,11 +143,13 @@ void Atendente(void *Argumento)
 			continue;
 		}
 
+		Dados->PidEmAtendimento = Cliente.Pid;
 		kill(Cliente.Pid, SIGCONT);
 		EsperaClienteTerminar(Cliente.Pid);
+		Dados->PidEmAtendimento = 0;
 		long FimMs = TempoDecorridoMs();
 
-		EscreveLng(Cliente.Pid);
+		EscreveLng(Cliente.Pid, Dados->PidAnalista);
 
 		if(ClienteSatisfeito(&Cliente, FimMs, Dados->X))
 			Dados->Satisfeitos++;

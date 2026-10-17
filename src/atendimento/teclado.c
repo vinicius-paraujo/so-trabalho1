@@ -1,20 +1,13 @@
 #include "teclado.h"
 
 #include <fcntl.h>
-#include <signal.h>
 #include <termios.h>
 #include <unistd.h>
 
 static struct termios TerminalOriginal;
 static int EhTerminal = 0;
 static int FlagsOriginais;
-
-static void TratadorInterrupcao(int Sinal)
-{
-	(void)Sinal;
-	RestauraTeclado();
-	_exit(130);
-}
+static int Configurado = 0;
 
 // Por padrão, o terminal só entrega o que foi digitado após o Enter e read() espera até haver
 // entrada. Aqui cada tecla passa a ser entregue na hora, sem eco, e read() retorna imediatamente.
@@ -37,11 +30,13 @@ void ConfiguraTeclado()
 		fcntl(STDIN_FILENO, F_SETFL, FlagsOriginais | O_NONBLOCK);
 	}
 
-	signal(SIGINT, TratadorInterrupcao);
+	Configurado = 1;
 }
 
 void RestauraTeclado()
 {
+	if(!Configurado) return;
+
 	if(EhTerminal)
 		tcsetattr(STDIN_FILENO, TCSANOW, &TerminalOriginal);
 	else

@@ -11,6 +11,7 @@ typedef struct
 	volatile int  SemaforosCriados;   // o Analista só pode ser criado depois disso
 	volatile int  Encerrar;           // pedido externo de parada (modo N = 0)
 	volatile long Criados;
+	volatile pid_t PidEmCriacao;      // cliente criado e ainda não inserido na fila; 0 se nenhum
 
 } RECEPCAO;
 

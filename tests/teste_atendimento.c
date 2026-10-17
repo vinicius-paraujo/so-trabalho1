@@ -30,6 +30,8 @@ typedef struct
 	long Atendidos;
 	long TempoMs;
 	int  ResumoLido;
+	int  CodigoInformado;      // "codigo=N" impresso pelo próprio comando de teste
+	int  AvisoAnalista;
 
 } EXECUCAO;
 
@@ -58,6 +60,10 @@ static EXECUCAO Executa(const char *Comando)
 			Execucao.ResumoLido++;
 		else if(sscanf(Linha, "Tempo total: %ld ms", &Execucao.TempoMs) == 1)
 			Execucao.ResumoLido++;
+		else if(sscanf(Linha, "codigo=%d", &Execucao.CodigoInformado) == 1)
+			;
+		else if(strstr(Linha, "Analista terminou") != NULL)
+			Execucao.AvisoAnalista = 1;
 	}
 
 	Execucao.Codigo = pclose(Saida);
@@ -105,8 +111,8 @@ static void TestaExecucao(const char *Comando, int N)
 	VERIFICA(access(ARQUIVO_DEMANDA, F_OK) != 0);
 }
 
-// Conta processos "cliente" ainda existentes, inclusive parados
-static int ClientesRemanescentes()
+// Conta processos com o nome dado ainda existentes, inclusive parados
+static int ProcessosRemanescentes(const char *Programa)
 {
 	int Encontrados = 0;
 	DIR *Diretorio = opendir("/proc");
@@ -122,7 +128,7 @@ static int ClientesRemanescentes()
 		fscanf(Arquivo, "%63s", Nome);
 		fclose(Arquivo);
 
-		if(strcmp(Nome, "cliente") == 0) Encontrados++;
+		if(strcmp(Nome, Programa) == 0) Encontrados++;
 	}
 
 	if(Diretorio != NULL) closedir(Diretorio);
@@ -143,9 +149,42 @@ static void TestaModoInfinito(const char *Comando)
 	VERIFICA(PidsDistintos(&Execucao));
 
 	// Clientes que ficaram na fila foram encerrados, sem sobrar processos parados
-	VERIFICA(ClientesRemanescentes() == 0);
+	VERIFICA(ProcessosRemanescentes("cliente") == 0);
 	VERIFICA(SemaforosRemanescentes() == 0);
 	VERIFICA(access(ARQUIVO_LNG, F_OK) != 0);
+}
+
+// Processos encerrados com SIGKILL somem da tabela logo depois, quando o init os recolhe
+static int EsperaSumirem(const char *Programa)
+{
+	for(int Tentativa = 0; Tentativa < 20 && ProcessosRemanescentes(Programa) > 0; Tentativa++)
+		usleep(50000);
+
+	return ProcessosRemanescentes(Programa);
+}
+
+static void TestaInterrupcao()
+{
+	EXECUCAO Execucao = Executa("./atendimento 0 100 & P=$!; sleep 0.7; kill -INT $P; wait $P; echo codigo=$?");
+
+	// 130 = encerrado pelo tratador de Ctrl+C
+	VERIFICA(Execucao.CodigoInformado == 130);
+	VERIFICA(EsperaSumirem("cliente") == 0);
+	VERIFICA(EsperaSumirem("analista") == 0);
+	VERIFICA(SemaforosRemanescentes() == 0);
+	VERIFICA(access(ARQUIVO_LNG, F_OK) != 0);
+	VERIFICA(access(ARQUIVO_DEMANDA, F_OK) != 0);
+}
+
+// Se o Analista morrer, o Atendimento não pode esperar por ele para sempre
+static void TestaAnalistaMorto()
+{
+	EXECUCAO Execucao = Executa("timeout 20 ./atendimento 200 50 2>&1 & P=$!; sleep 0.3; pkill -KILL -x analista; wait $P; echo codigo=$?");
+
+	VERIFICA(Execucao.CodigoInformado == 0);
+	VERIFICA(Execucao.AvisoAnalista);
+	VERIFICA(Execucao.Atendidos == 200);
+	VERIFICA(SemaforosRemanescentes() == 0);
 }
 
 int main()
@@ -158,10 +197,13 @@ int main()
 	// Mais clientes que a capacidade da fila e paciência curta
 	TestaExecucao("./atendimento 250 50", 250);
 
-	TestaModoInfinito("(sleep 1; printf s) | ./atendimento 0 100");
+	TestaModoInfinito("(sleep 2; printf s) | ./atendimento 0 100");
 
 	// Teclas diferentes de "s" são ignoradas
-	TestaModoInfinito("(sleep 0.5; printf xq; sleep 0.5; printf s) | ./atendimento 0 20");
+	TestaModoInfinito("(sleep 1; printf xq; sleep 1; printf s) | ./atendimento 0 20");
+
+	TestaInterrupcao();
+	TestaAnalistaMorto();
 
 	return RESUMO_TESTES();
 }

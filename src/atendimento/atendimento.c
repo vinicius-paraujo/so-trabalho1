@@ -47,15 +47,56 @@ static void EncerraClientesNaFila()
 
 static void LiberaRecursos()
 {
-	// O Analista está parado, fora da região crítica do LNG: pode ser encerrado sem prender /sem_block
-	kill(DadosAtendente.PidAnalista, SIGKILL);
-	waitpid(DadosAtendente.PidAnalista, NULL, 0);
+	// O Analista está parado, fora da região crítica do LNG: pode ser encerrado sem prender /sem_block.
+	// Se ele já terminou, o PID já foi recolhido e poderia pertencer a outro processo: não se envia sinal.
+	if(AnalistaAtivo())
+	{
+		kill(DadosAtendente.PidAnalista, SIGKILL);
+		waitpid(DadosAtendente.PidAnalista, NULL, 0);
+	}
 
 	sem_unlink(SEM_ATEND);
 	sem_unlink(SEM_BLOCK);
 
 	remove(ARQUIVO_LNG);
 	remove(ARQUIVO_PID_ANALISTA);
+}
+
+// Ctrl+C interrompe o programa em qualquer ponto. Sem este tratador, clientes parados e o Analista
+// continuariam existindo, e os semáforos e arquivos ficariam no sistema.
+static void TratadorInterrupcao(int Sinal)
+{
+	(void)Sinal;
+
+	for(int i = 0; i < Fila.Tamanho; i++)
+		kill(Fila.Clientes[i].Pid, SIGKILL);
+
+	if(DadosAtendente.PidEmAtendimento > 0) kill(DadosAtendente.PidEmAtendimento, SIGKILL);
+
+	// O SIGKILL não é instantâneo: espera o cliente em criação e o Analista morrerem,
+	// senão eles poderiam recriar o arquivo de demanda ou o LNG depois da remoção
+	if(DadosRecepcao.PidEmCriacao > 0)
+	{
+		kill(DadosRecepcao.PidEmCriacao, SIGKILL);
+		waitpid(DadosRecepcao.PidEmCriacao, NULL, 0);
+	}
+	if(DadosAtendente.PidAnalista > 0)
+	{
+		kill(DadosAtendente.PidAnalista, SIGKILL);
+		waitpid(DadosAtendente.PidAnalista, NULL, 0);
+	}
+
+	sem_unlink(SEM_ATEND);
+	sem_unlink(SEM_BLOCK);
+	unlink(ARQUIVO_LNG);
+	unlink(ARQUIVO_LNG_TEMP);
+	unlink(ARQUIVO_PID_ANALISTA);
+	unlink(ARQUIVO_DEMANDA);
+
+	RestauraTeclado();
+
+	// Os filhos encerrados são recolhidos pelo init quando este processo termina
+	_exit(130);
 }
 
 int main(int argc, char *argv[])
@@ -96,6 +137,8 @@ int main(int argc, char *argv[])
 	if(N == 0)
 		ConfiguraTeclado();
 
+	signal(SIGINT, TratadorInterrupcao);
+
 	ConfiguraTemporizador(QUANTUM_US);
 
 	CriaThread(Recepcao, &DadosRecepcao);
@@ -127,6 +170,9 @@ int main(int argc, char *argv[])
 
 	// O enunciado exige que todo PID já atendido seja impresso antes da saída
 	EsvaziaLng(&DadosAtendente);
+
+	if(!AnalistaAtivo())
+		fprintf(stderr, "Atendimento: o Analista terminou inesperadamente; PIDs podem nao ter sido impressos\n");
 
 	long TempoTotal = TempoDecorridoMs();
 	DesligaTemporizador();

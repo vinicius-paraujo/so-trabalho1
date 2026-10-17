@@ -12,6 +12,8 @@ typedef struct
 	RECEPCAO *Recepcao;
 	pid_t     PidAnalista;
 
+	volatile pid_t PidEmAtendimento;  // 0 quando nenhum cliente está sendo atendido
+
 	volatile int  Encerrar;      // pedido externo de parada (modo N = 0)
 	volatile long Atendidos;
 	volatile long Satisfeitos;
@@ -21,5 +23,6 @@ typedef struct
 void Atendente(void *Argumento);
 int  ClienteSatisfeito(CLIENTE *Cliente, long FimMs, long X);
 void EsvaziaLng(ATENDENTE *Dados);
+int  AnalistaAtivo();
 
 #endif

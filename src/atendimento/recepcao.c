@@ -93,6 +93,7 @@ void Recepcao(void *Argumento)
 		CLIENTE Cliente;
 		Cliente.HoraChegada = TempoDecorridoMs();
 		Cliente.Pid = CriaCliente();
+		Dados->PidEmCriacao = Cliente.Pid;
 
 		// Os clientes são criados um de cada vez porque todos escrevem no mesmo arquivo de demanda
 		// Se o cliente terminou sem parar, o execl falhou: insistir só criaria processos inúteis
@@ -112,6 +113,7 @@ void Recepcao(void *Argumento)
 		HabilitaInterrupcoes();
 
 		InsereFila(Dados->Fila, Cliente);
+		Dados->PidEmCriacao = 0;
 		Dados->Criados++;
 	}
 }
