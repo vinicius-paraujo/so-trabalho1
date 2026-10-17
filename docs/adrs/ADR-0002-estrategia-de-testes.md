@@ -37,7 +37,7 @@ que precisam ser medidas de forma repetível para fundamentar decisões de proje
    - *Detecção*: testes de volume (milhares de iterações) aumentam a probabilidade de exercitar
      o entrelaçamento defeituoso; o resultado é binário.
    - *Depuração*: ao falhar, o teste informa a primeira iteração divergente; o caso é
-     reproduzido no **modo cooperativo** (determinístico, troca apenas em `yield`); se o defeito
+     reproduzido no **modo cooperativo** (determinístico, troca apenas em `CedeProcessador`); se o defeito
      depender da preempção, varia-se o quantum para isolá-lo; por fim, usam-se `gdb` e
      `valgrind` sobre o caso reduzido.
 6. **Restrição herdada da ADR-0001:** os testes também não utilizam bibliotecas de

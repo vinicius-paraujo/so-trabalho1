@@ -42,7 +42,7 @@
 │  · calcula satisfação; tira o cliente da fila            │                      │
 │  · acorda o Analista ────────────────────────────────────┼──────────────────────┘
 │                                                          │
-│  Núcleo: TCB[], pilhas, timer_stub, Scheduler (ADR-0001) │
+│  Núcleo: TCB[], pilhas, TrocaContexto, Escalonador      │
 └──────────────────────────────────────────────────────────┘
    Arquivos: Demanda (cliente → Recepção), LNG (Atendente → Analista), PID do Analista
 ```
@@ -55,13 +55,13 @@ Espelha `protokernel/aulafinal/kernel.c`, transposto do UEFI para o Linux:
 
 | Conceito (aula) | `kernel.c` (UEFI) | Atendimento (Linux) |
 |---|---|---|
-| PCB/TCB | `PROCESS Process[2]` | `TCB Thread[MAX_THREADS]` com `Rsp`, `Stack`, `State`, `Entry` |
-| Pilha própria | `kalloc(STACK_SIZE)` | área de `STACK_SIZE` bytes por *thread* |
-| Contexto inicial | `InitProcess` monta o quadro da pilha | `InitThread` monta o quadro da pilha |
-| Interrupção de *timer* | APIC x2, vetor 32, periódico | `setitimer(ITIMER_REAL)` + `SIGALRM` *(provisório)* |
-| Salvamento de contexto | `timer_stub` (*naked*) | rotina equivalente em *assembly* embutido |
-| Escalonador | `Scheduler(CurrentRsp)` devolve novo `rsp` | mesma assinatura e semântica |
-| Exclusão mútua interna | `Acquire/Release` (`InterlockedCompareExchange32`) | `Acquire/Release` com instrução atômica (modelo `me4-tsl.c`) |
+| PCB/TCB | `PROCESS Process[2]` | `THREAD Thread[MAX_THREADS]` com `Rsp`, `Pilha`, `Estado`, `Entrada`, `Argumento` |
+| Pilha própria | `kalloc(STACK_SIZE)` | área estática de `TAMANHO_PILHA` bytes por *thread* |
+| Contexto inicial | `InitProcess` monta o quadro da pilha | `CriaThread` monta o quadro da pilha |
+| Interrupção de *timer* | APIC x2, vetor 32, periódico | `ConfiguraTemporizador`: `setitimer(ITIMER_REAL)` + `SIGALRM` (ADR-0004) |
+| Salvamento de contexto | `timer_stub` (*naked*) | `TrocaContexto` (*naked*), chamada por `CedeProcessador` e `TratadorTemporizador` |
+| Escalonador | `Scheduler(CurrentRsp)` devolve novo `rsp` | `Escalonador(RspAtual)`, mesma semântica |
+| Exclusão mútua interna | `Acquire/Release` (`InterlockedCompareExchange32`) | `EntraRegiaoCritica/SaiRegiaoCritica` com instrução atômica (modelo `me4-tsl.c`) |
 
 ### 3.2 Thread 2 — Recepção
 
@@ -74,7 +74,7 @@ Espelha `protokernel/aulafinal/kernel.c`, transposto do UEFI para o Linux:
 ### 3.3 Fila de clientes
 
 Estrutura própria, compartilhada entre as *threads* e acessada somente dentro de
-`Acquire()`/`Release()`. A **ordem de retirada** é a principal alavanca de desempenho e será
+`EntraRegiaoCritica()`/`SaiRegiaoCritica()`. A **ordem de retirada** é a principal alavanca de desempenho e será
 decidida em ADR própria, por medição.
 
 ### 3.4 Thread 1 — Atendente
@@ -112,7 +112,7 @@ Trabalho-Yuri-1/
 ├── docs/            board.md, architecture.md, adrs/
 ├── src/
 │   ├── atendimento.c      main, entradas, métricas
-│   ├── kernel.c / .h      TCB, InitThread, Scheduler, troca de contexto, Acquire/Release
+│   ├── nucleo.c / .h      TCB, CriaThread, Escalonador, TrocaContexto, região crítica
 │   ├── fila.c / .h        fila de clientes
 │   ├── recepcao.c         Thread 2
 │   ├── atendente.c        Thread 1
