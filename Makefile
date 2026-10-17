@@ -6,8 +6,8 @@ LDLIBS  = -pthread
 
 PROGRAMAS = atendimento analista cliente
 # Fontes compartilhados pelo Atendimento e pelos testes
-FONTES    = src/nucleo.c src/fila.c
-CABECALHOS = src/nucleo.h src/fila.h src/comum.h
+FONTES    = src/nucleo.c src/fila.c src/relogio.c src/recepcao.c
+CABECALHOS = src/nucleo.h src/fila.h src/comum.h src/relogio.h src/recepcao.h
 TESTES    = $(patsubst tests/%.c,build/tests/%,$(wildcard tests/teste_*.c))
 
 .PHONY: all test clean

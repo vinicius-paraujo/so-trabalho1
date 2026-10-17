@@ -65,11 +65,22 @@ Espelha `protokernel/aulafinal/kernel.c`, transposto do UEFI para o Linux:
 
 ### 3.2 Thread 2 — Recepção
 
-1. Cria `/sem_atend` e `/sem_block` (antes do primeiro cliente; sem eles o cliente ignora o semáforo).
-2. Cria o cliente com `fork()` + `execve()`.
-3. Aguarda o cliente parar (`SIGSTOP`), garantindo que o arquivo Demanda foi escrito; lê a demanda.
-4. Registra hora de chegada (ms desde o início), sorteia a prioridade e insere na fila.
-5. Com `N = 0`, suspende a criação enquanto a fila tiver 100 clientes.
+Implementada em `recepcao.c`/`recepcao.h`; recebe uma estrutura `RECEPCAO` compartilhada (N, fila,
+sinalizadores `SemaforosCriados`, `Encerrar` e o contador `Criados`). O relógio do programa
+(`relogio.c`, `CLOCK_MONOTONIC`) fornece a hora de chegada.
+
+1. Remove semáforos remanescentes e cria `/sem_atend` e `/sem_block` livres; marca
+   `SemaforosCriados` — o Analista só deve ser criado depois disso, para não abrir um semáforo
+   que será substituído.
+2. Antes de cada cliente, se a fila estiver cheia (100), cede o processador até haver espaço.
+   A espera ocorre **antes** da criação, de modo que a hora de chegada não inclui o tempo de fila
+   cheia. Vale para `N = 0` (nota 9) e também para `N > 0`.
+3. Registra a hora de chegada e cria o cliente com `fork` + `execl("./cliente")`.
+4. Espera o cliente parar (`waitpid` com `WUNTRACED | WNOHANG`, cedendo o processador entre
+   consultas); só então o arquivo de demanda está escrito. Um cliente por vez (nota 7).
+5. Lê e apaga `demanda.txt`, sorteia a prioridade (50/50) e insere na fila.
+6. Se o cliente terminar sem parar (falha no `execl`), sinaliza `Encerrar` e para, em vez de
+   criar processos indefinidamente.
 
 ### 3.3 Fila de clientes
 
