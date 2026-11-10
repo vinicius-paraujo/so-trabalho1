@@ -14,6 +14,7 @@
 
 #define QUANTUM_US 1000
 #define TOTAL      150
+#define X          100
 
 static FILA     Fila;
 static RECEPCAO Dados;
@@ -47,7 +48,7 @@ int main()
 	srand(time(NULL));
 	IniciaRelogio();
 	IniciaNucleo();
-	IniciaFila(&Fila);
+	IniciaFila(&Fila, X);
 	ConfiguraTemporizador(QUANTUM_US);
 
 	Dados.N = TOTAL;
@@ -59,11 +60,17 @@ int main()
 	VERIFICA(TamanhoFila(&Fila) == CAPACIDADE_FILA);
 	VERIFICA(Dados.Criados == CAPACIDADE_FILA);
 
+	// A Recepção insere na ordem de chegada; a ordem de retirada é decidida pela fila
+	int OrdemChegada = 1;
+	for(int i = 1; i < CAPACIDADE_FILA; i++)
+		if(Fila.Clientes[i].HoraChegada < Fila.Clientes[i - 1].HoraChegada) OrdemChegada = 0;
+	VERIFICA(OrdemChegada);
+
 	// O main faz o papel de um Atendente que apenas retira, liberando espaço
 	int Total = 0;
 	while(Total < TOTAL)
 	{
-		if(RetiraFila(&Fila, &Recebidos[Total]))
+		if(RetiraFila(&Fila, &Recebidos[Total], TempoDecorridoMs()))
 			Total++;
 		else
 			CedeProcessador();
@@ -76,7 +83,7 @@ int main()
 	VERIFICA(Dados.Criados == TOTAL);
 	VERIFICA(Dados.SemaforosCriados);
 
-	int Parados = 0, DemandasValidas = 0, OrdemChegada = 1, Altas = 0;
+	int Parados = 0, DemandasValidas = 0, Altas = 0;
 	for(int i = 0; i < TOTAL; i++)
 	{
 		if(EstadoProcesso(Recebidos[i].Pid) == 'T') Parados++;
@@ -84,15 +91,12 @@ int main()
 		int Demanda = Recebidos[i].Demanda;
 		if(Demanda == 1 || Demanda == 5 || Demanda == 15) DemandasValidas++;
 
-		if(i > 0 && Recebidos[i].HoraChegada < Recebidos[i - 1].HoraChegada) OrdemChegada = 0;
-
 		if(Recebidos[i].Prioridade == PRIORIDADE_ALTA) Altas++;
 	}
 
 	// Todo cliente enfileirado é um processo real, parado à espera do atendimento
 	VERIFICA(Parados == TOTAL);
 	VERIFICA(DemandasValidas == TOTAL);
-	VERIFICA(OrdemChegada);
 
 	// 50% de chance para cada prioridade: com 150 clientes, sair desta faixa é praticamente impossível
 	VERIFICA(Altas > 45 && Altas < 105);

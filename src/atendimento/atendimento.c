@@ -38,7 +38,7 @@ static void EncerraClientesNaFila()
 {
 	CLIENTE Cliente;
 
-	while(RetiraFila(&Fila, &Cliente))
+	while(RetiraFila(&Fila, &Cliente, TempoDecorridoMs()))
 	{
 		kill(Cliente.Pid, SIGKILL);
 		waitpid(Cliente.Pid, NULL, 0);
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 	srand(time(NULL));
 	IniciaRelogio();
 	IniciaNucleo();
-	IniciaFila(&Fila);
+	IniciaFila(&Fila, X);
 	remove(ARQUIVO_LNG);
 
 	DadosRecepcao.N = N;

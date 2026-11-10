@@ -12,13 +12,15 @@ static int AnalistaDormindo = 0;
 static int AnalistaVivo = 1;
 static int PidsPendentes = 0;
 
+// Média móvel da duração de um atendimento (peso 1/8 para a última medida), usada para prever quando
+// o próximo terminará. Guardada multiplicada por 8 para não perder a parte fracionária
+static long DuracaoMediaX8 = 0;
+
 static sem_t *SemBlock;
 
 int ClienteSatisfeito(CLIENTE *Cliente, long FimMs, long X)
 {
-	long Paciencia = (Cliente->Prioridade == PRIORIDADE_ALTA) ? X / 2 : X;
-
-	return (FimMs - Cliente->HoraChegada) <= Paciencia;
+	return (FimMs - Cliente->HoraChegada) <= PacienciaCliente(Cliente, X);
 }
 
 // waitpid só informa uma vez cada parada; por isso o estado é guardado em AnalistaDormindo
@@ -137,7 +139,9 @@ void Atendente(void *Argumento)
 	while(DeveContinuar(Dados))
 	{
 		CLIENTE Cliente;
-		if(!RetiraFila(Dados->Fila, &Cliente))
+		long InicioMs = TempoDecorridoMs();
+		long PrevisaoTerminoMs = InicioMs + DuracaoMediaX8 / 8;
+		if(!RetiraFila(Dados->Fila, &Cliente, PrevisaoTerminoMs))
 		{
 			CedeProcessador();
 			continue;
@@ -148,6 +152,7 @@ void Atendente(void *Argumento)
 		EsperaClienteTerminar(Cliente.Pid);
 		Dados->PidEmAtendimento = 0;
 		long FimMs = TempoDecorridoMs();
+		DuracaoMediaX8 += (FimMs - InicioMs) - DuracaoMediaX8 / 8;
 
 		EscreveLng(Cliente.Pid, Dados->PidAnalista);
 

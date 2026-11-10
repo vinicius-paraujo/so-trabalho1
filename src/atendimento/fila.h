@@ -28,13 +28,15 @@ typedef struct
 {
 	CLIENTE Clientes[CAPACIDADE_FILA];
 	int     Tamanho;
+	long    X;           // paciência dos clientes de prioridade baixa, em ms
 	TRAVA   Trava;
 
 } FILA;
 
-void IniciaFila(FILA *Fila);
+void IniciaFila(FILA *Fila, long X);
+long PacienciaCliente(CLIENTE *Cliente, long X);
 int  InsereFila(FILA *Fila, CLIENTE Cliente);
-int  RetiraFila(FILA *Fila, CLIENTE *Cliente);
+int  RetiraFila(FILA *Fila, CLIENTE *Cliente, long PrevisaoTerminoMs);
 int  TamanhoFila(FILA *Fila);
 
 #endif

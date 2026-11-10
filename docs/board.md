@@ -10,15 +10,13 @@ Um cartão só entra em **A fazer** quando todas as suas dependências estão em
 
 | ID | Título | Dependências | Responsável | Critério de pronto |
 |---|---|---|---|---|
-| T-14 | Revisão aprofundada do código | T-11, T-12 | Marcos | Todo o código revisado linha a linha pela equipe; dúvidas e ajustes resolvidos; Remover material que não for essencial |
 | T-13 | Roteiro da apresentação | T-14 | — | Roteiro de até 15 minutos vinculado às ADRs. |
 
 ## A fazer
 
 | ID | Título | Dependências | Responsável | Critério de pronto |
 |---|---|---|---|---|
-| T-11 | Política da fila | T-10 | — | Comparação medida entre políticas registrada em ADR; política escolhida implementada. |
-| T-12 | README de compilação e execução | T-10 | — | Qualquer pessoa compila e executa seguindo apenas o README. |
+| T-14 | Revisão aprofundada do código | T-11, T-12 | Marcos | Todo o código revisado linha a linha pela equipe; dúvidas e ajustes resolvidos; Remover material que não for essencial |
 
 ## Em andamento
 
@@ -46,3 +44,5 @@ Um cartão só entra em **A fazer** quando todas as suas dependências estão em
 | T-08 | *Thread* Atendente | T-06, T-07 | Marcos | Atende, mede tempo, avalia satisfação, grava PID e acorda o Analista. |
 | T-09 | Modo `N = 0` (tecla `s`) | T-08 | Marcos | `s` encerra; Analista esvazia o arquivo antes da saída. |
 | T-10 | Métricas finais e limpeza de recursos | T-08 | Marcos | Imprime taxa de satisfação e tempo total; sem semáforos, arquivos ou zumbis remanescentes. |
+| T-11 | Política da fila | T-10 | Tiago | Comparação medida entre políticas registrada em ADR; política escolhida implementada (ADR-0010). |
+| T-12 | README de compilação e execução | T-10 | Tiago | Qualquer pessoa compila e executa seguindo apenas o README. |

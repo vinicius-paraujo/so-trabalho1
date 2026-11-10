@@ -16,3 +16,4 @@ substitui (status "Substituída por ADR-XXXX").
 | [0007](ADR-0007-despertar-do-analista.md) | Despertar do Analista sem perda de sinal | Aceita |
 | [0008](ADR-0008-fim-do-atendimento-por-waitpid.md) | Fim do atendimento detectado por `waitpid` | Aceita |
 | [0009](ADR-0009-biblioteca-c-sem-preempcao.md) | Chamadas à biblioteca C com interrupções desabilitadas | Aceita |
+| [0010](ADR-0010-politica-da-fila.md) | Política de retirada da fila: prazo mais próximo entre os ainda satisfazíveis | Aceita |

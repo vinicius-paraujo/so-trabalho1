@@ -90,15 +90,18 @@ toda operação (`InsereFila`, `RetiraFila`, `TamanhoFila`) é uma região crít
 bloqueiam: devolvem 0 quando a fila está cheia ou vazia, e quem chamou decide se cede o
 processador e tenta de novo.
 
-A retirada atual é por ordem de chegada (posição 0, deslocando as demais). A **ordem de retirada**
-é a principal alavanca de desempenho e será decidida em ADR própria, por medição; o vetor simples
-permite retirar de qualquer posição sem mudar a estrutura.
+A inserção é por ordem de chegada; a **retirada** segue a
+[ADR-0010](adrs/ADR-0010-politica-da-fila.md): `RetiraFila` recebe a previsão de término do
+próximo atendimento e escolhe, entre os clientes cujo prazo (`chegada + paciência`) ainda não
+terá passado, o de prazo mais próximo (EDF); se nenhum puder mais ser satisfeito, o mais antigo.
+A paciência (`X/2` ou `X`) é calculada só em `PacienciaCliente`.
 
 ### 3.4 Thread 1 — Atendente
 
 Implementada em `atendente.c`/`atendente.h` (ADR-0008). Para cada cliente:
 
-1. Retira o próximo cliente da fila (se vazia, cede o processador).
+1. Retira o próximo cliente da fila (se vazia, cede o processador), informando a previsão de
+   término: agora + média móvel da duração dos atendimentos anteriores.
 2. Acorda o cliente (`SIGCONT`) e espera seu término com `waitpid(..., WNOHANG)`, cedendo o
    processador entre consultas; o término implica que o cliente já liberou `/sem_atend`.
 3. Registra a hora de término e grava o PID no LNG dentro de `/sem_block` (`sem_trywait`).

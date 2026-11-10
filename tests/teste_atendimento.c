@@ -7,7 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define MAX_PIDS 1000
+#define MAX_PIDS 50000
 
 static void TestaSatisfacao()
 {
@@ -176,14 +176,15 @@ static void TestaInterrupcao()
 	VERIFICA(access(ARQUIVO_DEMANDA, F_OK) != 0);
 }
 
-// Se o Analista morrer, o Atendimento não pode esperar por ele para sempre
+// Se o Analista morrer, o Atendimento não pode esperar por ele para sempre.
+// N grande o bastante para o programa ainda estar em execução quando o Analista é encerrado
 static void TestaAnalistaMorto()
 {
-	EXECUCAO Execucao = Executa("timeout 20 ./atendimento 200 50 2>&1 & P=$!; sleep 0.3; pkill -KILL -x analista; wait $P; echo codigo=$?");
+	EXECUCAO Execucao = Executa("timeout 30 ./atendimento 5000 50 2>&1 & P=$!; sleep 0.3; pkill -KILL -x analista; wait $P; echo codigo=$?");
 
 	VERIFICA(Execucao.CodigoInformado == 0);
 	VERIFICA(Execucao.AvisoAnalista);
-	VERIFICA(Execucao.Atendidos == 200);
+	VERIFICA(Execucao.Atendidos == 5000);
 	VERIFICA(SemaforosRemanescentes() == 0);
 }
 
